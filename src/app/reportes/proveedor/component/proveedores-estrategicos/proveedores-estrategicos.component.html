@@ -17,7 +17,6 @@
                         <th>Categoría</th>
                         <th>Calificación</th>
                         <th>N° de compras por año</th>
-                        <th>Condición de pago</th>
                         <th>Rubro</th>
                     </tr>
                 </thead>
@@ -41,7 +40,6 @@
                               }"></span>
                         </td>
                         <td>{{producto.OcEvaluadas}}</td>
-                        <td>{{producto.condicion || 'Sin datos'}}</td>
                         <td>{{producto.observacion}}</td>
                     </tr>
                     <tr *ngFor="let servicio of arrServicio">
@@ -63,7 +61,6 @@
                               }"></span>
                         </td>
                         <td>{{servicio.OcEvaluadas}}</td>
-                        <td>{{servicio.condicion || 'Sin datos'}}</td>
                         <td>{{servicio.observacion}}</td>
                     </tr>
                     <tr *ngFor="let subContrato of arrSubcontrato">
@@ -85,7 +82,6 @@
                               }"></span>
                         </td>
                         <td>{{subContrato.OcEvaluadas}}</td>
-                        <td>{{subContrato.condicion || 'Sin datos'}}</td>
                         <td>{{subContrato.observacion}}</td>
                     </tr>
                 </tbody>
