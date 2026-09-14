@@ -15,6 +15,7 @@ export class GraficoProveedorComponent implements OnInit {
   data: EvalProveedoresYear[];
 
   agno: number;
+  anios: number[];
   reportEvalProv$: Observable<ReportEvalProv[]>;
   reportEvalProv: ReportEvalProv[];
 
@@ -25,6 +26,11 @@ export class GraficoProveedorComponent implements OnInit {
   ) {
     this.loading = false;
     this.agno = new Date().getFullYear();
+
+    this.anios = [];
+    for (let i = 0; i < 5; i++) {
+      this.anios.push(this.agno - i);
+    }
 
     this.data = [
       { year: 2012, tipoProveedor: 'Bienes - Servicios', cantidadProveedores: 26, cantidadEvaluaciones: 0, notaPromedio: 2.49 },

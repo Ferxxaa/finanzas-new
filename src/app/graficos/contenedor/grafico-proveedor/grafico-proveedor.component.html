@@ -27,11 +27,20 @@
                         </div>
                     </div>
                     <div class="row grafico-proveedor-reportes" *ngIf="reportEvalProv">
-    <div class="col-lg-12">
-        <app-resumen-anual [agno]="agno" [reportEvalProv]="reportEvalProv" [inline]="true"></app-resumen-anual>
-        <app-proveedores-estrategicos [agno]="agno" [reportEvalProv]="reportEvalProv" [inline]="true"></app-proveedores-estrategicos>
-    </div>
-</div>
+                        <div class="col-lg-12">
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <label for="filtroAgno" style="font-weight: bold;">Año:</label>
+                                    <select id="filtroAgno" class="form-control" [(ngModel)]="agno" (ngModelChange)="changeYear($event)">
+                                        <option *ngFor="let y of anios" [value]="y">{{ y }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <app-resumen-anual [agno]="agno" [reportEvalProv]="reportEvalProv" [inline]="true"></app-resumen-anual>
+                            <app-proveedores-estrategicos [agno]="agno" [reportEvalProv]="reportEvalProv" [inline]="true"></app-proveedores-estrategicos>
+                        </div>
+                    </div>
                 </fieldset>
 
             </div>
