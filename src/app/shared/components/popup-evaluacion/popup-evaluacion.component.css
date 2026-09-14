@@ -1,0 +1,35 @@
+.subir{
+    margin-top: -6px;
+}
+
+.blue{
+    color: rgb(64, 64, 255);
+}
+
+.amarillo{
+    color:rgb(255, 216, 0);
+}
+
+.promedio{
+    font-size: 1.2rem;
+}
+
+.b1px{
+    border: 1px solid #ccc;
+}
+
+@media (max-width: 767px) {
+    .Evaluacion > .row > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .b1px {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+    }
+
+    .eval {
+        margin-bottom: 0.5rem;
+    }
+}

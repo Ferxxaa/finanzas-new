@@ -1,0 +1,81 @@
+.flex{
+    display: flex;
+}
+
+.flex h4{
+    width: 90%;
+}
+
+.rentabilidad-grafico-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 12px 0;
+    color: #527225;
+    border-color: #b9cd98;
+    background-color: #f7faf3;
+}
+
+.rentabilidad-grafico-toggle:hover {
+    color: #3f5f1b;
+    border-color: #8fba4c;
+    background-color: #edf4e2;
+}
+
+.rentabilidad-grafico-toggle mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+}
+
+.bkp-popup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.253);
+    display: flex;
+}
+
+.contenido {
+    height: 20vh;
+    min-width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    margin: auto;
+    font-size: 25px;
+    border-radius: 5px;
+}
+
+/************** Media Queries ************/
+@media (max-width: 800px) {
+    .contenido{
+        width: 45%;
+    }
+}
+
+.rentabilidad-rango-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 12px 8px 12px 0;
+    color: #4f5d6a;
+    border-color: #c9d0d5;
+    background-color: #fafafa;
+}
+
+.rentabilidad-rango-toggle:hover {
+    color: #35424d;
+    border-color: #8fba4c;
+    background-color: #f2f6ec;
+}
+
+.rentabilidad-rango-toggle mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+}

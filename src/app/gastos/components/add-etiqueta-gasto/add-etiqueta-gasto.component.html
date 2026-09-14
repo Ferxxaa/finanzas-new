@@ -1,0 +1,31 @@
+<div class="etiqueta-container">
+  <div class="row">
+    <div class="col-lg-12">
+      <label class="lbl-form">Nombre etiqueta</label>
+      <input class="form-control" type="text" placeholder="Nombre etiqueta" name="txtNombreEtiqueta"
+        [(ngModel)]="etiqueta.nombreEtiqueta">
+    </div>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-lg-12 flex-btns">
+      <button class="btn btn-primary" (click)="AgregarEtiqueta()">Guardar</button>
+      <button class="btn btn-secondary" (click)="Limpiar()">Limpiar</button>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-lg-12">
+      <label class="lbl-form">Etiquetas registradas</label>
+      <div class="etiquetas-chips">
+        <span class="chip" *ngFor="let etiqueta of etiquetasGastos$ | async">
+          <span class="chip-text">{{ etiqueta.nombreEtiqueta }}</span>
+          <button type="button" class="chip-remove" (click)="eliminarEtiqueta(etiqueta); $event.stopPropagation()" aria-label="Eliminar etiqueta">×</button>
+        </span>
+        <span class="chip-empty" *ngIf="(etiquetasGastos$ | async)?.length === 0">
+          Sin etiquetas registradas
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

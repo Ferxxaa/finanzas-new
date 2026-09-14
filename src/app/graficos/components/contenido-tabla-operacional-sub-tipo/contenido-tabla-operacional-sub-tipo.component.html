@@ -1,0 +1,81 @@
+<div>
+  <table class="table table-bordered table-striped table-hover no-footer principal">
+    <thead>
+      <tr>
+        <!-- <th class="wmin"></th> -->
+        <th>Tipo</th>
+        <th>Enero</th>
+        <th>Febero</th>
+        <th>Marzo</th>
+        <th>Abril</th>
+        <th>Mayo</th>
+        <th>Junio</th>
+        <th>Julio</th>
+        <th>Agosto</th>
+        <th>Septiembre</th>
+        <th>Octubre</th>
+        <th>Noviembre</th>
+        <th>Diciembre</th>
+        <th>Total Categoria</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let tipo of viewModel; trackBy: trackByTipo">
+        <tr (click)="toggleMes(tipo.nombreTipoGasto)" class="pointer">
+          <!-- <td class="tipoGasto"><mat-icon aria-hidden="false" aria-label="Desplegar">add_box</mat-icon></td> -->
+          <!-- <td class="wmin"></td> -->
+          <td class="tipoGasto"> <!-- colspan="12" -->
+            {{tipo.nombreTipoGasto}} 
+            <mat-icon aria-hidden="false" aria-label="Desplegar" class="fleft">{{ isExpanded(tipo.nombreTipoGasto) ? 'indeterminate_check_box' : 'add_box' }}</mat-icon>
+          </td>
+          <td class="tipoGasto">$ {{tipo.enero | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.febrero | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.marzo | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.abril | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.mayo | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.junio | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.julio | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.agosto | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.septiembre | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.octubre | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.noviembre | number:'1.0-0' | comatopoint}}</td>
+          <td class="tipoGasto">$ {{tipo.diciembre | number:'1.0-0' | comatopoint}}</td>
+          <!-- <td class="tipoGasto">Total Tipo</td> -->
+          <td class="tipoGasto">$ {{tipo.totalCategoria | number:'1.0-0' | comatopoint}}</td>
+        </tr>
+        <tr *ngFor="let element of tipo.gastos; trackBy: trackBySubTipo" [class.myCollapse]="!isExpanded(tipo.nombreTipoGasto)">
+          <td class="text">{{element.subTipo | cortarTextos}}</td>
+          <td>$ {{element.enero | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.febrero | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.marzo | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.abril | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.mayo | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.junio | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.julio | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.agosto | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.septiembre | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.octubre | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.noviembre | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.diciembre | number:'1.0-0' | comatopoint}}</td>
+          <td>$ {{element.totalCategoria | number:'1.0-0' | comatopoint}}</td>
+        </tr>
+      </ng-container>
+      <tr class="bold">
+        <td class="text">TOTAL</td>
+        <td>$ {{totalMeses.enero | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.febrero | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.marzo | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.abril | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.mayo | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.junio | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.julio | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.agosto | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.septiembre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.octubre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.noviembre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMeses.diciembre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalGeneral | number:'1.0-0' | comatopoint}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

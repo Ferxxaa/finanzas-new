@@ -1,0 +1,14 @@
+<div class="chart-shell">
+    <div class="chart-head">
+        <span class="chart-kicker">Visualizacion</span>
+        <h4>Comparativo de cierres por centro</h4>
+    </div>
+    <div class="chart-canvas-wrap">
+        <div class="chart-empty" *ngIf="emptyTitle">
+            <span class="fa fa-line-chart chart-empty-icon"></span>
+            <strong>{{emptyTitle}}</strong>
+            <span>{{emptyDescription}}</span>
+        </div>
+        <canvas id="myChart"></canvas>
+    </div>
+</div>

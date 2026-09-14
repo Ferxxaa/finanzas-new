@@ -1,0 +1,23 @@
+<div class="bkPopUp" (click)="salir()">
+    <div class="popUp" (click)="noCerrar($event)">
+        <div class="modal-head">
+            <div>
+                <span class="modal-kicker">Analisis</span>
+                <h3>Resumen grafico de cierres</h3>
+                <p>Selecciona uno o varios centros de costo para comparar su porcentaje de cierre por año.</p>
+            </div>
+            <button type="button" class="close-modal" (click)="salir()" aria-label="Cerrar resumen grafico">
+                <span class="fa fa-times"></span>
+            </button>
+        </div>
+
+        <div class="modal-grid">
+            <div class="modal-sidebar">
+                <app-list-centro-costo (listadoCentroSelected)="displayGraph($event)"></app-list-centro-costo>
+            </div>
+            <div class="modal-content">
+                <app-garph-cierres></app-garph-cierres>
+            </div>
+        </div>
+    </div>
+</div>

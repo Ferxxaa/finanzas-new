@@ -1,0 +1,563 @@
+/**** Layout ****/
+
+.Content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: white;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    position: relative;
+    min-height: 72px;
+    width: 100%;
+    padding: 0.75rem 0;
+    overflow: hidden;
+}
+
+.Medio {
+    position: relative;
+    min-height: 60vh;
+    width: 100%;
+    background-image: url("/assets/Images/bg-loggin.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    flex: 1 0 auto;
+    z-index: 1;
+}
+
+footer {
+    position: relative;
+    width: 100%;
+    padding-bottom: 1rem;
+    flex: 0 0 auto;
+}
+
+.Loggin {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    display: block;
+    background-color: rgba(255, 255, 255, 0.94);
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: 1.5rem;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(4px);
+}
+
+
+/**** Header ****/
+
+.w80 {
+    height: 100%;
+    width: 80%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+header a span {
+    vertical-align: middle;
+}
+
+.TZS-right {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.h100 {
+    display: block;
+    height: auto;
+    max-height: 56px;
+    width: auto;
+    max-width: min(100%, 320px);
+}
+
+.nbi-1 {
+    fill: #2c2e34;
+}
+
+.nbi-1,
+.nbi-11,
+.nbi-3,
+.nbi-5,
+.nbi-7,
+.nbi-9 {
+    fill-rule: evenodd;
+}
+
+.nbi-10,
+.nbi-12,
+.nbi-2,
+.nbi-4,
+.nbi-6,
+.nbi-8 {
+    fill: none;
+    stroke-miterlimit: 22.93;
+    stroke-width: 1.27px;
+}
+
+.nbi-2 {
+    stroke: #2c2e34;
+}
+
+.nbi-3 {
+    fill: #696c74;
+}
+
+.nbi-4 {
+    stroke: #696c74;
+}
+
+.nbi-5 {
+    fill: #d3802f;
+}
+
+.nbi-6 {
+    stroke: #d3802f;
+}
+
+.nbi-7 {
+    fill: #495258;
+}
+
+.nbi-8 {
+    stroke: #495258;
+}
+
+.nbi-9 {
+    fill: #e3a732;
+}
+
+.nbi-10 {
+    stroke: #e3a732;
+}
+
+.nbi-11 {
+    fill: #d78d30;
+}
+
+.nbi-12 {
+    stroke: #d78d30;
+}
+
+.tzs1 {
+    fill: none;
+}
+
+.tzs2 {
+    fill: #201f1d;
+}
+
+.tzs3 {
+    clip-path: url(#clip-path);
+}
+
+.tzs4 {
+    clip-path: url(#clip-path-2);
+}
+
+
+/**** Controles Loggin ***/
+
+.Loggin img,
+.Loggin h2 {
+    display: inline;
+}
+
+.Loggin h2 {
+    font-family: arial, serif;
+    display: block;
+    margin: 0.75rem 0 1.5rem;
+    font-size: 1.8rem;
+}
+
+.usuario {
+    margin: 0 auto 1rem;
+    margin-top: 0;
+    padding: 0.95rem 1rem;
+    background: white;
+    border-radius: 1em;
+    text-align: left;
+    cursor: text;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: inset 0 0 0 1px rgba(44, 46, 52, 0.08);
+}
+
+.pass {
+    margin: 0 auto 1rem;
+    padding: 0.95rem 1rem;
+    background: white;
+    border-radius: 1em;
+    text-align: left;
+    cursor: text;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: inset 0 0 0 1px rgba(44, 46, 52, 0.08);
+}
+
+
+/**** Objetos loggin ****/
+
+.h50px {
+    height: 50px;
+    vertical-align: middle;
+}
+
+.usuario span,
+.pass span {
+    font-size: 1.5em;
+    color: #6baa1f;
+}
+
+.input-mat {
+    background: 0 0;
+    border: none;
+    font-size: 1.05rem;
+    display: inline-block;
+    width: 100%;
+}
+
+.input-mat:focus,
+.input-mat:active {
+    border: none;
+    outline: none;
+}
+
+form button {
+    font-size: 1.2rem;
+    background: #6baa1f;
+    color: white;
+    width: 100%;
+    min-height: 52px;
+    border-radius: 999px;
+    margin-top: 0.5rem;
+    box-shadow: 0 12px 24px rgba(107, 170, 31, 0.22);
+}
+
+.error-msg {
+    margin-top: 0.9rem;
+    color: #b62929;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+
+/**** Footer ****/
+
+.slider,
+.info {
+    height: 50%;
+}
+
+.slider {
+    width: min(80%, 1220px);
+    margin: 0 auto;
+    display: block;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.info {
+    width: 80%;
+    display: flex;
+    margin: 0 auto;
+    gap: 0;
+}
+
+
+/**** Contenido footer ****/
+
+
+/* flexbox */
+
+.flex {
+    display: flex;
+    height: 100%;
+    width: 300%;
+    align-items: center;
+    animation: Scroll 40s infinite 5s;
+}
+
+.flex>div {
+    width: 11.1%;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    height: 100%;
+}
+
+.flex i {
+    font-size: 3em;
+    margin-right: 5px;
+    color: #e3a732;
+}
+
+.flex span {
+    font-size: 0.85em;
+    text-align: justify;
+}
+
+
+/**** Info ****/
+
+.Empresa,
+.Contactos {
+    width: 50%;
+    min-height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    background: #eee;
+    border-radius: 0 1em 0 0;
+    align-content: center;
+}
+
+.Empresa {
+    border-right: 1px solid rgb(99, 99, 99);
+    border-radius: 1em 0 0 0;
+}
+
+.info span {
+    display: block;
+    width: 100%;
+}
+
+
+/**** Animaciones ****/
+
+@keyframes Scroll {
+    0% {
+        transform: translateX(0);
+    }
+    8% {
+        transform: translateX(0);
+    }
+    11% {
+        transform: translateX(-11.1%);
+    }
+    18% {
+        transform: translateX(-11.1%);
+    }
+    21% {
+        transform: translateX(-22.2%);
+    }
+    36% {
+        transform: translateX(-22.2%);
+    }
+    39% {
+        transform: translateX(-33.3%);
+    }
+    54% {
+        transform: translateX(-33.3%);
+    }
+    57% {
+        transform: translateX(-44.4%);
+    }
+    72% {
+        transform: translateX(-44.4%);
+    }
+    75% {
+        transform: translateX(-55.5%);
+    }
+    90% {
+        transform: translateX(-55.5%);
+    }
+    93% {
+        transform: translateX(0%);
+    }
+}
+
+
+/**** PopUp ****/
+
+
+/* 
+.PopUp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.7);
+} */
+
+
+/**** spinner ****/
+
+.spinner {
+    position: absolute;
+    background: white;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 100;
+}
+
+.spinner i {
+    position: relative;
+    top: 46%;
+    font-size: 3em;
+}
+
+
+/**** Media Queries *****/
+
+@media (max-width: 1200px) {
+    .slider {
+        width: 90%;
+    }
+
+    .info {
+        width: 90%;
+    }
+}
+
+@media (max-width: 800px) {
+    header {
+        min-height: 64px;
+    }
+
+    .w80 {
+        width: 92%;
+    }
+
+    .Medio {
+        min-height: auto;
+        padding: 1.5rem 1rem;
+    }
+
+    .Loggin {
+        max-width: 520px;
+        padding: 1.25rem;
+    }
+
+    .Loggin h2 {
+        font-size: 1.55rem;
+    }
+
+    .slider,
+    .info {
+        width: 92%;
+    }
+
+    .slider {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .flex {
+        width: max-content;
+        min-width: 100%;
+        animation: none;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .flex>div {
+        width: 260px;
+        min-height: 88px;
+        flex: 0 0 auto;
+        background: #f6f6f6;
+        border-radius: 1rem;
+    }
+
+    .info {
+        flex-direction: column;
+    }
+
+    .Empresa,
+    .Contactos {
+        width: 100%;
+        min-height: 88px;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+    }
+
+    .Empresa {
+        border-right: none;
+        border-bottom: 1px solid rgb(99, 99, 99);
+        border-radius: 1rem 1rem 0 0;
+    }
+
+    .Contactos {
+        border-radius: 0 0 1rem 1rem;
+    }
+}
+
+@media (max-width: 560px) {
+    header {
+        padding: 0.5rem 0;
+    }
+
+    .w80 {
+        width: 94%;
+        gap: 0.5rem;
+    }
+
+    .TZS-right {
+        max-width: 42%;
+    }
+
+    .Loggin {
+        padding: 1rem;
+        border-radius: 1.1rem;
+    }
+
+    .Loggin h2 {
+        font-size: 1.35rem;
+    }
+
+    .usuario,
+    .pass {
+        padding: 0.85rem 0.9rem;
+    }
+
+    .usuario span,
+    .pass span {
+        font-size: 1.2rem;
+    }
+
+    .input-mat {
+        font-size: 1rem;
+    }
+
+    form button {
+        min-height: 48px;
+        font-size: 1.05rem;
+    }
+
+    .slider,
+    .info {
+        width: 94%;
+    }
+
+    .flex>div {
+        width: 220px;
+    }
+}

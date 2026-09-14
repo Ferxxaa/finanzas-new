@@ -1,0 +1,251 @@
+.listado-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-field {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    border: 1px solid #d8e1e8;
+    border-radius: 4px;
+    background: #fff;
+    color: #61727d;
+}
+
+.filter-field .fa {
+    color: #555555;
+}
+
+.filter-field input {
+    width: 100%;
+    padding: 10px 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #214055;
+    font-size: 12px;
+}
+
+.filter-clear {
+    padding: 9px 12px;
+    border: 1px solid #c8d3db;
+    border-radius: 4px;
+    background: #f7fafc;
+    color: #445966;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.filter-clear:hover {
+    background: #eef3f6;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 4px;
+    color: #fff;
+    background: #555555;
+}
+
+.header-kicker {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.74);
+}
+
+.header-pill {
+    padding: 5px 8px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.listado {
+    min-height: 100px;
+}
+
+.cerrados {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.licerrados {
+    overflow: hidden;
+    border: 1px solid #d8e1e8;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: none;
+}
+
+.year-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border: none;
+    background: #f7fafc;
+    text-align: left;
+    cursor: pointer;
+}
+
+.year-label {
+    display: block;
+    color: #13364a;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.year-meta {
+    display: block;
+    margin-top: 4px;
+    color: #61727d;
+    font-size: 11px;
+}
+
+.year-toggle .fa {
+    color: #516575;
+}
+
+ul {
+    list-style: none;
+    padding-inline-start: 0;
+    margin: 0;
+}
+
+.internos {
+    background: #fff;
+    border-top: 1px solid #e2e8ed;
+}
+
+.internos > li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 12px;
+    border-bottom: 1px solid #e2e8ed;
+    color: #214055;
+    transition: background-color 0.2s ease;
+}
+
+.internos > li:last-child {
+    border-bottom: none;
+}
+
+.internos > li:hover {
+    background-color: #f5f8fa;
+}
+
+.centro-name {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.centro-copy {
+    min-width: 0;
+}
+
+.centro-detail {
+    display: block;
+    margin-top: 2px;
+    color: #61727d;
+    font-size: 10px;
+}
+
+.centro-amount {
+    display: block;
+    margin-top: 3px;
+    color: #3f5562;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.centro-share {
+    flex-shrink: 0;
+    color: #555555;
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.normal {
+    font-weight: 100;
+}
+
+.selected {
+    background: #e8f1f6;
+    color: #1f4154 !important;
+    border-left: 3px solid #7ea2b8;
+}
+
+.selected .centro-share {
+    color: #1f4154;
+}
+
+.selected .centro-detail,
+.selected .centro-amount {
+    color: #456172;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 18px 12px;
+    border-radius: 4px;
+    background: #f4f7f9;
+    border: 1px solid #d8e1e8;
+    color: #57707d;
+    text-align: center;
+}
+
+.empty-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 34px;
+    color: #516575;
+}
+
+@media (max-width: 640px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .internos > li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

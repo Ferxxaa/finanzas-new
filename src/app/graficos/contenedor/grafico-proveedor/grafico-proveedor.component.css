@@ -1,0 +1,103 @@
+.grafico-proveedor-colores {
+    margin-bottom: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.grafico-proveedor-colores ::ng-deep .colores {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 6px;
+    border: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.grafico-proveedor-colores ::ng-deep .titulo {
+    display: none !important;
+}
+
+.grafico-proveedor-colores ::ng-deep .bot,
+.grafico-proveedor-colores ::ng-deep .colores > div:last-child {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1 1 0 !important;
+    min-width: 0;
+    border: 1px solid #d5d5d5;
+    border-radius: 4px;
+    background-color: #fafafa;
+    overflow: hidden;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.grafico-proveedor-colores ::ng-deep .colores > div > div:nth-child(1) {
+    padding: 4px 6px !important;
+    font-size: 10px;
+    color: #555;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.grafico-proveedor-colores ::ng-deep .colores > div > div:nth-child(2) {
+    padding: 4px 8px !important;
+    min-width: auto !important;
+    border-radius: 0;
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+.grafico-proveedor-layout {
+    align-items: stretch;
+    display: flex;
+}
+
+.grafico-proveedor-left {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.grafico-proveedor-left ::ng-deep app-resumen,
+.grafico-proveedor-left ::ng-deep app-resumen > div,
+.grafico-proveedor-left ::ng-deep table {
+    height: 100%;
+}
+
+.grafico-proveedor-right {
+    display: flex;
+    align-items: stretch;
+}
+
+.grafico-proveedor-right app-grafico {
+    width: 100%;
+    display: flex;
+}
+
+.grafico-proveedor-right ::ng-deep app-grafico,
+.grafico-proveedor-right ::ng-deep app-grafico > div,
+.grafico-proveedor-right ::ng-deep canvas {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+@media (max-width: 992px) {
+    .grafico-proveedor-layout {
+        display: block;
+    }
+
+    .grafico-proveedor-left,
+    .grafico-proveedor-right {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+.grafico-proveedor-reportes {
+    margin-top: 30px;
+}

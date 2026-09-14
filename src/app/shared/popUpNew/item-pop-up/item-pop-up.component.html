@@ -1,0 +1,128 @@
+<div class="Items caja">
+  <div class="row labelHeder">
+    <div class="col-9 bold">
+      <u>2.- DETALLE DE MATERIALES</u>
+    </div>
+    <div class="col-3 text-right cotizacion" *ngIf="cotizacion && url">
+      <a href="{{url}}" target="_blank">
+        <span class="cotizacion-desktop">Cotización</span>
+        <span class="cotizacion-copy">
+          <span class="cotizacion-titulo">Ver cotizacion</span>
+          <span class="cotizacion-subtitulo">Archivo adjunto para aprobacion</span>
+        </span>
+        <span class="cotizacion-badge">PDF</span>
+      </a>
+    </div>
+  </div>
+  <div class="row labelHeder">
+    <div class="col-12">
+      <div class="table-responsive popup-table-responsive desktop-items-table">
+        <table class="table table-bordered table-striped table-hover no-footer">
+          <thead>
+            <tr class="center">
+              <td>Item</td>
+              <td>Codigo</td>
+              <td>Detalle</td>
+              <td>Cantidad</td>
+              <td>Unitario</td>
+              <td>Total</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of items; let i = index">
+              <td>{{i+1}}</td>
+              <td>{{item.codigo}}</td>
+              <td>{{item.detalle}}</td>
+              <td>{{item.cantidad | number : '1.0-0' | comatopoint}}</td>
+              <td>$ {{item.precioUnitario | number : '1.0-0' | comatopoint}}</td>
+              <td>$ {{item.cantidad * item.precioUnitario | number : '1.0-0' | comatopoint}}</td>
+            </tr>
+            <tr class="bgWhite">
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="brRigt">Total Neto</td>
+<td>$ {{totalOC | number : '1.0-0' | comatopoint}}
+</td>
+            </tr>
+            <tr class="bgWhite" *ngIf="afecta">
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="brRigt">IVA afecto</td>
+              <td>$ {{afecta | number : '1.0-0' | comatopoint}}</td>
+            </tr>
+            <tr class="bgWhite" *ngIf="boleta">
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="brRigt">Boletas</td>
+              <td>$ {{boleta | number : '1.0-0' | comatopoint}}</td>
+            </tr>
+            <tr class="bgWhite">
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="brRigt">Total Bruto</td>
+              <td>$ {{totalOC + afecta + boleta | number : '1.0-0' | comatopoint}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mobile-items-list">
+        <div class="mobile-item-card" *ngFor="let item of items; let i = index">
+          <div class="mobile-item-card-header">
+            <span class="mobile-item-index">Item {{i + 1}}</span>
+            <span class="mobile-item-total">$ {{item.cantidad * item.precioUnitario | number : '1.0-0' | comatopoint}}</span>
+          </div>
+
+          <div class="mobile-item-row">
+            <span class="mobile-item-label">Codigo</span>
+            <span class="mobile-item-value">{{item.codigo || '-'}}</span>
+          </div>
+
+          <div class="mobile-item-row mobile-item-row-detail">
+            <span class="mobile-item-label">Detalle</span>
+            <span class="mobile-item-value">{{item.detalle}}</span>
+          </div>
+
+          <div class="mobile-item-grid">
+            <div class="mobile-item-stat">
+              <span class="mobile-item-label">Cantidad</span>
+              <span class="mobile-item-value">{{item.cantidad | number : '1.0-0' | comatopoint}}</span>
+            </div>
+            <div class="mobile-item-stat">
+              <span class="mobile-item-label">Unitario</span>
+              <span class="mobile-item-value">$ {{item.precioUnitario | number : '1.0-0' | comatopoint}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-summary-card">
+          <div class="mobile-summary-row">
+  <span>Total Neto</span>
+  <strong>$ {{totalOC | number : '1.0-0' | comatopoint}}</strong>
+</div>
+          <div class="mobile-summary-row" *ngIf="afecta">
+            <span>IVA afecto</span>
+            <strong>$ {{afecta | number : '1.0-0' | comatopoint}}</strong>
+          </div>
+          <div class="mobile-summary-row" *ngIf="boleta">
+            <span>Boletas</span>
+            <strong>$ {{boleta | number : '1.0-0' | comatopoint}}</strong>
+          </div>
+          <div class="mobile-summary-row mobile-summary-total">
+            <span>Total Bruto</span>
+            <strong>$ {{totalOC + afecta + boleta | number : '1.0-0' | comatopoint}}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

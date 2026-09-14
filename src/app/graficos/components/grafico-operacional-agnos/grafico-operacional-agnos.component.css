@@ -1,0 +1,9 @@
+.graph-operacional-agnos {
+	position: relative;
+	min-height: 320px;
+}
+
+.graph-operacional-agnos canvas {
+	width: 100% !important;
+	height: 320px !important;
+}

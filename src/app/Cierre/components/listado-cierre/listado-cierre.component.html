@@ -1,0 +1,76 @@
+<div class="listado-shell">
+  <div class="header center">
+    <div>
+      
+      <span class="h4 bold">Seguimiento de Centro de Costos</span>
+    </div>
+    <span class="header-pill">{{getListadoFiltrado().length}} registros</span>
+  </div>
+
+  <div class="filter-bar" *ngIf="listado && listado.length">
+    <label class="filter-field" for="filtroCentroCerrado">
+      <span class="fa fa-search"></span>
+      <input
+        id="filtroCentroCerrado"
+        type="text"
+        [(ngModel)]="filtroCentro"
+        placeholder="Filtrar centros ya cerrados"
+      >
+    </label>
+    <button type="button" class="filter-clear" *ngIf="hasFiltroActivo()" (click)="limpiarFiltro()">
+      Limpiar
+    </button>
+  </div>
+
+  <div class="listado">
+    <div *ngIf="listado && listado.length; else emptyState" class="cerrados">
+      <div *ngIf="getListadoFiltrado().length; else emptyFilterState">
+      <div *ngFor="let item of getListadoFiltrado() | sortAgnos" class="licerrados">
+        <button type="button" class="year-toggle" (click)="display(item._id)">
+          <div>
+            <span class="year-label">{{getPeriodoCierre(item)}}</span>
+            <span class="year-meta">{{getCentroCostoFiltrado(item).length}} centros con cierre registrado</span>
+          </div>
+          <span class="fa" [ngClass]="shouldShowYearDetails(item) ? 'fa-chevron-up' : 'fa-chevron-down'"></span>
+        </button>
+
+        <ul *ngIf="shouldShowYearDetails(item)" class="internos normal">
+          <li *ngFor="let centroCosto of getCentroCostoFiltrado(item) | calcPorcentaje:item:totales:montosPeriodoPorCentro" [ngClass]="{selected: centrosSelected.includes(centroCosto.nombre)}">
+            <div class="centro-copy">
+              <span class="centro-name">{{centroCosto.nombre}}</span>
+              <span class="centro-detail">{{getResumenDetalleCentro(item, centroCosto.nombre)}}</span>
+              <span class="centro-amount">
+                Pagos confirmados + proyectado en {{getPeriodoCentroVisible(item, centroCosto.nombre)}}: $ {{centroCosto.totalOrdenAgno | number:'1.0-0' | comatopoint}}
+              </span>
+              <span class="centro-amount" *ngFor="let detalleAgno of getDesglosePeriodo(item, centroCosto.nombre)">
+                Total {{detalleAgno.agno}}: $ {{detalleAgno.total | number:'1.0-0' | comatopoint}}
+              </span>
+              <span class="centro-amount" *ngIf="centroCosto.totalCentro">
+                Base acumulada actual del centro: $ {{centroCosto.totalCentro | number:'1.0-0' | comatopoint}}
+              </span>
+            </div>
+            <span class="centro-share" *ngIf="centroCosto.totalCentro">{{centroCosto.totalOrdenAgno * 100 / centroCosto.totalCentro | number:'1.2-2' | comatopoint}}%</span>
+            <span class="centro-share" *ngIf="!centroCosto.totalCentro">--</span>
+          </li>
+        </ul>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #emptyState>
+  <div class="empty-state">
+    <span class="fa fa-history empty-icon"></span>
+    <strong>Sin cierres registrados</strong>
+    <span>Cuando cierres un periodo, el historial aparecera aqui.</span>
+  </div>
+</ng-template>
+
+<ng-template #emptyFilterState>
+  <div class="empty-state">
+    <span class="fa fa-filter empty-icon"></span>
+    <strong>Sin coincidencias</strong>
+    <span>No hay centros cerrados que coincidan con el filtro actual.</span>
+  </div>
+</ng-template>

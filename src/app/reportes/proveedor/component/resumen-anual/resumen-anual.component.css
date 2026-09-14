@@ -1,0 +1,150 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.bkPopUp.inline {
+    position: static;
+    background-color: transparent;
+    display: block;
+    z-index: auto;
+    width: 100% !important;
+    height: auto;
+    padding: 0;
+}
+
+.bkPopUp.inline .popUp {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    animation: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid #e3e6ea;
+    border-radius: 6px;
+    margin-bottom: 30px;
+}
+
+.popUp {
+    font-size: 13px;
+    overflow: hidden;
+    max-height: 85%;
+    overflow-y: auto;
+    width: 80%;
+    max-width: 1400px;
+    padding-top: 0px;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.bkPopUp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.popUp::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    background-color: #F5F5F5;
+}
+
+.popUp::-webkit-scrollbar {
+    width: 6px;
+    background-color: #F5F5F5;
+}
+
+.popUp::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #a5a5a5;
+}
+
+.hb {
+    background: linear-gradient(135deg, #4a4a4a 0%, #333333 100%);
+    color: white;
+    padding: 9px 16px;
+    letter-spacing: 0.3px;
+    margin: 0;
+    width: 100%;
+}
+
+.hb .h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.bb1 {
+    border-bottom: none;
+}
+
+.p10 {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.center {
+    text-align: center;
+    font-weight: bold;
+}
+
+.principal {
+    width: 100% !important;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th {
+    background-color: #0d6dbf;
+    color: white;
+    text-transform: capitalize !important;
+    font-weight: 600;
+    font-size: 11.5px;
+    padding: 8px 14px !important;
+    border-bottom: none !important;
+    border-color: #0d6dbf !important;
+}
+
+.principal td {
+    padding: 6px 14px;
+    font-size: 12px;
+    line-height: 1.3;
+    vertical-align: middle;
+    border-color: #eef0f2;
+}
+
+.principal tbody tr:hover {
+    background-color: #f4f8fc;
+    transition: background-color 0.15s ease;
+}
+
+.principal tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.bg-success {
+    background-color: #4caf7d !important;
+}
+
+.bg-warning {
+    background-color: #f0ad4e !important;
+}
+
+.bg-danger {
+    background-color: #e05d5d !important;
+}

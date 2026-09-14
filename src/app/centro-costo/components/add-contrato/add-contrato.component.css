@@ -1,0 +1,128 @@
+.bgAbs {
+    top: 0px;
+    left: 0px;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.192);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contenido {
+    width: 40%;
+    min-height: 25vh;
+    background-color: white;
+    border-radius: 5px;
+}
+
+header {
+    /* background-color: #cccccc; */
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: white;
+    padding: 20px;
+    padding-bottom: 5px;
+    border-radius: 5px 5px 0px 0px;
+}
+
+section {
+    padding: 0px 20px;
+}
+
+footer {
+    padding: 0px 20px 20px 20px;
+}
+
+.mb10px {
+    margin-bottom: 10px;
+}
+
+.titulo-columnas {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.lista-contratos {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    border: 1px solid #ececec;
+    border-radius: 4px;
+}
+
+.lista-contratos li {
+    list-style: none;
+    margin: 0;
+}
+
+.contrato-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px 40px;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #ececec;
+    cursor: pointer;
+}
+
+.contrato-item:last-child {
+    border-bottom: none;
+}
+
+.contrato-nombre {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.contrato-monto {
+    min-width: 130px;
+    text-align: right;
+    font-weight: 600;
+    justify-self: end;
+}
+
+.contrato-acciones {
+    justify-self: end;
+}
+
+.editar-btn {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+}
+
+.editar-btn .icon-lapiz {
+    font-size: 18px;
+    line-height: 18px;
+}
+
+.total-contratos {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border: 1px solid #ececec;
+    border-radius: 4px;
+    background-color: #fafafa;
+}
+
+.total-label {
+    font-weight: 600;
+}
+
+.total-monto {
+    text-align: right;
+    font-weight: 700;
+}
+
+.active{
+    transition: 0.5s;
+    background-color: rgb(230, 230, 255);
+}

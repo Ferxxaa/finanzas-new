@@ -1,0 +1,41 @@
+﻿.reporte-etiquetas {
+  margin-top: 10px;
+}
+
+.reporte-etiquetas .widget-body {
+  padding: 15px 20px 20px;
+}
+
+.reporte-etiquetas .table th,
+.reporte-etiquetas .table td {
+  vertical-align: middle;
+}
+
+.reporte-etiquetas .badge {
+  font-size: 0.85em;
+  padding: 0.4em 0.7em;
+}
+
+.reporte-etiquetas .table th {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6c757d;
+}
+
+.reporte-etiquetas .table-responsive {
+  border: 1px solid #e3e6f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.reporte-etiquetas .table thead th {
+  background-color: #f8f9fa;
+}
+
+.badge-primary { background-color: #4e73df; color: #fff; }
+.badge-danger { background-color: #e74a3b; color: #fff; }
+.badge-success { background-color: #1cc88a; color: #fff; }
+.badge-warning { background-color: #f6c23e; color: #1a1a1a; }
+.badge-secondary { background-color: #858796; color: #fff; }
+.badge-info { background-color: #36b9cc; color: #fff; }

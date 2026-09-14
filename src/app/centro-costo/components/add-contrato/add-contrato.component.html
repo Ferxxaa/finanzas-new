@@ -1,0 +1,67 @@
+<div class="bgAbs">
+    <div class="contenido">
+        <header *ngIf="centroCosto" [ngStyle]="{'background-color': centroCosto.fondo}">
+            <div class="row" [ngStyle]="{'color': centroCosto.letras}">
+                <div class="col-12">
+                    Configuración de Contratos - <span *ngIf="contrato">{{centroCosto.nombreCentroCosto}} </span>
+                </div>
+            </div>
+        </header>
+        <section>
+            <div class="row titulo-columnas">
+                <div class="col-6">
+                    Contrato
+                </div>
+                <div class="col-6">
+                    Monto de contrato
+                </div>
+            </div>
+            <div class="row mb10px">
+                <div class="col-6">
+                    <input class="form-control" type="text" placeholder="Nombre contrato" name="txtNombre"
+                        [(ngModel)]="contrato.nombreContrato" />
+                </div>
+                <div class="col-6">
+                    <input class="form-control" min=1 max=10 type="number" placeholder="Monto de contrato"
+                        name="txtMontoContrato" [(ngModel)]="contrato.monto" />
+                </div>
+            </div>
+            <ul class="lista-contratos">
+                <li *ngFor="let contrato of contratos$ | async; let i = index"
+                    role="button" class="contrato-item" [ngClass]="{'active': i == indiceEditar}">
+                    <span class="contrato-nombre">{{contrato.nombreContrato}}</span>
+                    <span class="contrato-monto">$ {{contrato.monto | number: '1.0-0' | comatopoint}}</span>
+                    <span class="contrato-acciones">
+                        <button type="button" mat-icon-button class="editar-btn"
+                            (click)="cargaContrato(contrato, i, $event)" title="Editar contrato">
+                            <span class="icon-lapiz">&#9998;</span>
+                        </button>
+                    </span>
+                </li>
+            </ul>
+            <div class="total-contratos">
+                <span class="total-label">Total contratos</span>
+                <span class="total-monto">$ {{totalMontoContratos | number: '1.0-0' | comatopoint}}</span>
+            </div>
+        </section>
+        <footer>
+            <div class="row">
+                <div class="col-6 text-right">
+                    <button *ngIf="indiceEditar < 0" mat-raised-button color="primary" (click)="crearContrato()"
+                        [disabled]="!contrato.nombreContrato || contrato.monto <= 0">
+                        Crear Contrato
+                    </button>
+                    <button *ngIf="indiceEditar >= 0" mat-raised-button color="primary" (click)="guardarEdicionContrato()"
+                        [disabled]="!contrato.nombreContrato || contrato.monto <= 0">
+                        Guardar Cambios
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button *ngIf="indiceEditar >= 0" mat-raised-button class="btn btn-light mr-2"
+                        (click)="cancelarEdicion()">Cancelar edición</button>
+                    <button mat-raised-button class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+<div class="simple-form">
+  <div class="form-group-block">
+    <label class="field-label" for="txtNombreAreaNegocio">Area de negocio</label>
+    <input id="txtNombreAreaNegocio" class="form-control" type="text" placeholder="Nombre del area"
+      name="txtNombre" required [(ngModel)]="areaNegocio.nombreAreaNegocio">
+  </div>
+
+  <div class="flex form-actions">
+    <button class="btn btn-primary" (click)="Agregar()">Guardar</button>
+    <button class="btn btn-secondary" (click)="Limpiar()">Limpiar</button>
+  </div>
+</div>

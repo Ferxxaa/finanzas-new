@@ -1,0 +1,57 @@
+.barTitle {
+    font-size: 16px;
+}
+
+.Folio {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.gray {
+    background-color: #cacaca;
+}
+
+.acciones{
+    margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+@media (max-width: 767px) {
+    .Folio {
+        font-size: 1rem;
+    }
+
+    .barTitle,
+    .Folio .col-9,
+    .Folio .col-3,
+    .OP .col-12,
+    .title .row .col-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .Folio .col-3,
+    .title .row .col-4 {
+        margin-top: 0.5rem;
+        text-align: left !important;
+    }
+
+    .FloatRight {
+        float: none;
+    }
+
+    .marginR {
+        margin-right: 0;
+    }
+
+    .acciones .btn {
+        width: 100%;
+    }
+
+    .acciones {
+        position: static;
+        padding-top: 0.75rem;
+        background: transparent;
+    }
+}

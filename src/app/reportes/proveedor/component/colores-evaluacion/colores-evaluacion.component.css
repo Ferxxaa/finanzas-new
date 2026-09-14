@@ -1,0 +1,52 @@
+.colores {
+    border: 2px solid #cccccc;
+    margin: 5px 0px;
+    width: 100%;
+    max-width: 420px;
+    font-size: 12px;
+}
+
+.colores > div {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    align-items: center;
+}
+
+.titulo {
+    font-weight: bold;
+    text-align: center;
+}
+
+.titulo > div:nth-child(1),
+.titulo > div:nth-child(2) {
+    border-bottom: 2px solid #cccccc;
+}
+
+.titulo > div:nth-child(1) {
+    border-right: 2px solid #cccccc;
+}
+
+.bot {
+    border-bottom: 2px solid #ccc;
+}
+
+.colores > div:nth-child(n+1) > div:nth-child(2) {
+    text-align: center;
+}
+
+.colores > div > div:nth-child(1) {
+    padding: 8px 10px;
+}
+
+.colores > div > div:nth-child(2) {
+    padding: 8px 10px;
+    min-width: 50px;
+}
+
+.colores .bg-success,
+.colores .bg-warning,
+.colores .bg-danger {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 6px;
+}

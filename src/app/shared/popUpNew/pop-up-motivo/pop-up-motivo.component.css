@@ -1,0 +1,9 @@
+@media (max-width: 767px) {
+	.motivo {
+		margin-top: 1rem;
+	}
+
+	.motivo textarea {
+		min-height: 110px;
+	}
+}

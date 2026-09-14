@@ -1,0 +1,103 @@
+<table class="table table-bordered table-striped table-hover no-footer principal">
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Enero</th>
+      <th>Febrero</th>
+      <th>Marzo</th>
+      <th>Abril</th>
+      <th>Mayo</th>
+      <th>Junio</th>
+      <th>Julio</th>
+      <th>Agosto</th>
+      <th>Septiembre</th>
+      <th>Octubre</th>
+      <th>Noviembre</th>
+      <th>Diciembre</th>
+      <th>Total Categoria</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let element of contenidoView; trackBy: trackByTipo">
+      <td class="text">{{element.tipo}}</td>
+      <td>$ {{element.enero | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.febrero | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.marzo | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.abril | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.mayo | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.junio | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.julio | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.agosto | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.septiembre | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.octubre | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.noviembre | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.diciembre | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{element.totalCategoria | number:'1.0-0' | comatopoint}}</td>
+    </tr>
+    <tr class="bold">
+      <td class="text">Total gastos</td>
+      <td>$ {{totalMeses.enero | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.febrero | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.marzo | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.abril | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.mayo | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.junio | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.julio | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.agosto | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.septiembre | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.octubre | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.noviembre | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalMeses.diciembre | number:'1.0-0' | comatopoint}}</td>
+      <td>$ {{totalGeneral | number:'1.0-0' | comatopoint}}</td>
+    </tr>
+    <ng-container *ngIf="inversiones">
+      <tr *ngFor="let element of inversionesView; trackBy: trackByTipo">
+        <td class="text">{{element.tipo}}</td>
+        <td>$ {{element.enero | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.febrero | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.marzo | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.abril | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.mayo | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.junio | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.julio | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.agosto | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.septiembre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.octubre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.noviembre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.diciembre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{element.totalCategoria | number:'1.0-0' | comatopoint}}</td>
+      </tr>
+      <tr class="bold">
+        <td class="text">Total general</td>
+        <td>$ {{totalMesesInversiones.enero | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.febrero | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.marzo | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.abril | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.mayo | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.junio | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.julio | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.agosto | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.septiembre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.octubre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.noviembre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalMesesInversiones.diciembre | number:'1.0-0' | comatopoint}}</td>
+        <td>$ {{totalGeneralInversiones | number:'1.0-0' | comatopoint}}</td>
+      </tr>
+  </ng-container>
+    <!-- <tr class="bold">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>Total General</td>
+      
+    </tr> -->
+  </tbody>
+</table>

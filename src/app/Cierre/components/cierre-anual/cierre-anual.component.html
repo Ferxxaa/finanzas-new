@@ -1,0 +1,172 @@
+<!-- <section class="widget">
+    <header style="background-color: #555555">
+        <h4 style="color: white;">
+            <strong>Cierre de año</strong>
+        </h4>
+    </header>
+    <div class="widget-body"> -->
+        <div class="cierre-anual-shell">
+          <div class="workflow-strip workflow-strip-4">
+            <div class="workflow-step" [class.is-ready]="tipoCierre && (tipoCierre !== 'etapas' || cantidadEtapas)">
+              <span class="step-index">1</span>
+              <div>
+                <strong>Tipo de cierre</strong>
+                <span>{{tipoCierre === 'etapas' ? getResumenEtapas() : getTipoCierreVisible()}}</span>
+              </div>
+            </div>
+            <div class="workflow-step" [class.is-ready]="!!tipoCierre && (tipoCierre === 'directo' ? !!fechaCorte : !!agno)">
+              <span class="step-index">2</span>
+              <div>
+                <strong>{{tipoCierre === 'etapas' ? 'Periodo de cierre' : 'Fecha de cierre'}}</strong>
+                <span>{{tipoCierre ? (tipoCierre === 'etapas' ? getPeriodoVisible() : getFechaCorteVisible()) : 'Pendiente'}}</span>
+              </div>
+            </div>
+            <div class="workflow-step" [class.is-ready]="cerrar.length">
+              <span class="step-index">3</span>
+              <div>
+                <strong>Centro de costo</strong>
+                <span>{{getResumenSeleccion()}}</span>
+              </div>
+            </div>
+            <div class="workflow-step" [class.is-ready]="tipoCierre && (tipoCierre !== 'etapas' || !!cantidadEtapas)">
+              <span class="step-index">4</span>
+              <div>
+                <strong>{{tipoCierre === 'etapas' ? 'Etapas' : 'Estado'}}</strong>
+                <span>{{tipoCierre === 'etapas' ? getResumenEtapas() : (tipoCierre ? 'Listo para ejecutar' : 'Pendiente')}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-card mode-card">
+            <label class="field-label field-label-step"><span class="field-step-index">1</span>Tipo de Cierre</label>
+            <div class="mode-grid">
+              <button type="button" *ngFor="let tipo of tiposCierre" class="mode-option" [class.is-selected]="tipoCierre === tipo.value" (click)="setTipoCierre(tipo.value)">
+                <strong>{{tipo.label}}</strong>
+                <span>{{tipo.description}}</span>
+              </button>
+            </div>
+
+            <div class="stage-config" *ngIf="tipoCierre === 'etapas'">
+              <div class="filters-grid">
+                <div class="field-card">
+                  <label class="field-label field-label-step"><span class="field-step-index">2</span>Año inicial del grupo</label>
+                  <select class="field-select" [value]="agno || ''" (change)="agno = $event.target.value ? +$event.target.value : null">
+                    <option value="" disabled>Selecciona un año</option>
+                    <option *ngFor="let item of agnosDisponibles" [value]="item">{{item}}</option>
+                  </select>
+                  <small class="field-help">Ese año sera la base del grupo; el termino de la ultima etapa definira hasta que año llega el cierre.</small>
+                </div>
+              </div>
+
+              <label class="field-label field-label-small field-label-step"><span class="field-step-index">3</span>Cantidad de etapas</label>
+              <select class="field-select" [value]="cantidadEtapas || ''" (change)="setCantidadEtapas($event.target.value ? +$event.target.value : null)">
+                <option value="" disabled>Selecciona cuantas etapas quieres</option>
+                <option *ngFor="let etapa of cantidadEtapasOpciones" [value]="etapa">{{etapa}} etapas</option>
+              </select>
+              <small class="field-help">Define en cuantas etapas quieres organizar este cierre.</small>
+
+              <div class="stage-timeline" *ngIf="etapasCierre && etapasCierre.length">
+                <div class="stage-row" *ngFor="let etapa of etapasCierre; let i = index">
+                  <div class="stage-badge">Etapa {{etapa.numero}}</div>
+                  <div class="stage-date-group">
+                    <label>Inicio</label>
+                    <input type="date" class="field-select stage-input" [value]="etapa.fechaInicio || ''" [readonly]="i !== 0" (change)="onFechaInicioEtapaChange(i, $event.target.value)">
+                  </div>
+                  <div class="stage-date-group">
+                    <label>Termino</label>
+                    <input type="date" class="field-select stage-input" [value]="etapa.fechaFin || ''" [min]="etapa.fechaInicio || ''" (change)="onFechaFinEtapaChange(i, $event.target.value)">
+                  </div>
+                </div>
+              </div>
+              <small class="field-help" *ngIf="etapasCierre && etapasCierre.length">La fecha inicial de la primera etapa se elige manualmente; las siguientes se calculan desde el termino anterior. El cierre agrupa hasta la fecha final de la ultima etapa.</small>
+            </div>
+
+            <div class="stage-config" *ngIf="tipoCierre === 'directo'">
+              <label class="field-label field-label-small field-label-step"><span class="field-step-index">2</span>Fecha del cierre</label>
+              <div class="field-card field-card-date">
+                <input type="date" id="txtfechaCorte" class="field-select" [value]="getFechaCorteInputVisible()" (change)="onFechaCorteChange($event.target.value)" />
+                <small class="field-help">Selecciona en el calendario la fecha con la que quieres ejecutar el cierre directo.</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="centros-card">
+            <div class="centros-card-head">
+              <div>
+                <h4><span class="field-step-index field-step-index-inline">3</span>Centros de Costo</h4>
+                <p>Selecciona un solo centro para ejecutar el cierre. El porcentaje muestra el ultimo cierre registrado.</p>
+              </div>
+              <span class="chip-counter">{{centrosCostoItems ? centrosCostoItems.length : 0}} activos</span>
+            </div>
+
+            <div class="selection-toolbar">
+              <button type="button" class="toolbar-button" (click)="limpiarSeleccion()" [disabled]="!cerrar.length">Limpiar seleccion</button>
+              <span class="selection-status">{{getResumenSeleccion()}}</span>
+            </div>
+
+            <div class="centros-grid">
+              <button type="button" *ngFor="let centro of centrosCostoItems" (click)="activate(centro)" class="centro-item" [ngClass]="{'isActive': isActive(centro)}" [ngStyle]="getCentroCardStyle(centro)">
+                <div class="centro-item-top">
+                  <div class="centro-title-wrap">
+                    <span class="fa fa-file-text-o centro-icon" [ngStyle]="getCentroIconStyle(centro)"></span>
+                    <span class="centro-title" [ngStyle]="getCentroTextStyle(centro)">{{centro.nombre}}</span>
+                  </div>
+                  <span class="centro-percent" [ngStyle]="getCentroTextStyle(centro)">
+                    {{filtraCierresCentroCosto(centro.nombre) | number:'1.2-2'}}%
+                    <small *ngIf="agnoUltimoCierrePorCentro[centro.nombre]" class="centro-percent-year">{{agnoUltimoCierrePorCentro[centro.nombre]}}</small>
+                  </span>
+                </div>
+                <div class="centro-meta">
+                  <span [ngStyle]="getCentroMetaStyle(centro)">{{getTextoPorcentajeCentro(centro.nombre)}}</span>
+                  <div class="centro-progress" [ngStyle]="getCentroProgressTrackStyle(centro)">
+                    <span [style.width.%]="filtraCierresCentroCosto(centro.nombre)" [ngStyle]="getCentroProgressStyle(centro)"></span>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div>
+              <span class="summary-label">Resumen listo para ejecutar</span>
+              <strong>{{getTextoAccionPrincipal()}}</strong>
+              <p>
+                Periodo: <b>{{getPeriodoVisible()}}</b>
+                <span class="summary-separator">|</span>
+                {{tipoCierre === 'etapas' ? 'Etapas' : 'Fecha'}}: <b>{{tipoCierre === 'etapas' ? getResumenEtapas() : (tipoCierre ? getFechaCorteVisible() : '--')}}</b>
+                <span class="summary-separator">|</span>
+                Centro: <b>{{cerrar.length ? cerrar[0] : '--'}}</b>
+                <span class="summary-separator">|</span>
+                Tipo: <b>{{getTipoCierreVisible()}}</b>
+                <span class="summary-separator" *ngIf="tipoCierre === 'etapas'">|</span>
+                <span *ngIf="tipoCierre === 'etapas'">Etapas: <b>{{getResumenEtapas()}}</b></span>
+              </p>
+            </div>
+          </div>
+
+          <div class="Action mt15">
+            <button type="button" class="primary-action" (click)="concluir()" [disabled]="!puedeConcluir()">{{getTextoAccionPrincipal()}}</button>
+            <button type="button" class="secondary-action" (click)="limpiar()">Reiniciar formulario</button>
+          </div>
+
+        </div>
+        <!-- <table class="table table-bordered table-striped table-hover no-footer principal mt30">
+          <thead>
+            <tr>
+              <th>subCentroCosto</th>
+              <th>Folio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let item of arrConcluir">
+              <tr *ngFor="let orden of item">
+                <td>{{orden.subCentroCosto}}</td>
+                <td>{{orden.folio}}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table> -->
+    <!-- </div>
+</section> -->
+
+<app-pop-up-loading *ngIf="loading"></app-pop-up-loading>

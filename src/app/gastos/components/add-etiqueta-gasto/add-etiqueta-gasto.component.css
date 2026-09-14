@@ -1,0 +1,66 @@
+.etiqueta-container {
+  max-width: 420px;
+}
+
+.lbl-form {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 0.35rem;
+}
+
+.flex-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.flex-btns button {
+  margin: 0;
+}
+
+.etiquetas-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 4px;
+  background-color: #e2e2e2;
+  color: #333;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #c9c9c9;
+  line-height: 1.3;
+}
+
+.chip-text {
+  display: inline-block;
+}
+
+.chip-remove {
+  border: none;
+  background: transparent;
+  color: #555;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.chip-remove:hover {
+  color: #d11a1a;
+}
+
+.chip-empty {
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}

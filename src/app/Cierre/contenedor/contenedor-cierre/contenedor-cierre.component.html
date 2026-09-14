@@ -1,0 +1,33 @@
+<section class="widget cierre-shell">
+    <div class="cierre-hero">
+        <div class="hero-copy">
+            <div class="hero-title-row">
+                <h2>Cierre Financiero Anual</h2>
+                <div class="hero-stat hero-stat-inline" *ngIf="totales">
+                    <strong>{{totales.length}}</strong>
+                    <span>Centros disponibles</span>
+                </div>
+            </div>
+            <p>Administra el cierre por centros de costo, fecha de corte y seguimiento historico.</p>
+        </div>
+        <div class="hero-actions">
+            <button type="button" class="graph-trigger" (click)="cierres=true" title="Cierres de Centros de costo">
+                <span class="fa fa-line-chart"></span>
+                <span>Resumen grafico</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="widget-body cierre-body">
+        <div class="cierre-grid">
+            <div class="panel panel-primary">
+                <app-cierre-anual (selectCentro)="selectCentro($event)" (reload)="restart()" (listado)="setCerrados($event)" *ngIf="totales" [totales]="totales"></app-cierre-anual>
+            </div>
+            <div class="panel panel-secondary" *ngIf="reload">
+                <app-listado-cierre *ngIf="totales" [totales]="totales"></app-listado-cierre>
+            </div>
+        </div>
+    </div>
+</section>
+
+<app-graph-cierres *ngIf="cierres" (cerrar)="cierres=false"></app-graph-cierres>

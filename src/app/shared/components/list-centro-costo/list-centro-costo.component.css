@@ -1,0 +1,63 @@
+.grid{
+    display: block;
+    padding: 0;
+    max-height: 64vh;
+    overflow-y: auto;
+}
+
+.grid h3 {
+    padding: 0;
+    margin: 0 0 8px;
+    margin-bottom: 8px;
+    color: #243846;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.list-help {
+    margin: 0 0 10px;
+    color: #647884;
+    font-size: 11px;
+}
+
+.li{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+   margin-bottom: 8px;
+   border: 1px solid #d8e1e8;
+   border-radius: 4px;
+   background: #fbfcfd;
+    text-align: left;
+   cursor: pointer; 
+   transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.li:hover {
+    border-color: #bfcbd4;
+    background: #f5f8fa;
+}
+
+.list-icon {
+    color: #555555;
+    font-size: 14px;
+}
+
+.list-name {
+    color: #213d4f;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.Active{
+    background-color: #555555;
+    border-color: #555555;
+    color: white;
+}
+
+.Active .list-icon,
+.Active .list-name {
+    color: white;
+}

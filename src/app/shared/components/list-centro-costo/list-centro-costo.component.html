@@ -1,0 +1,8 @@
+<div class="grid">
+  <h3 class="bold">Centros de costo</h3>
+  <p class="list-help">Haz clic para incluir o quitar centros del grafico.</p>
+  <button type="button" *ngFor="let centro of getCentroCostos$ | async | subCentroCosto" (click)="activate(centro.nombre)" class="li" [ngClass]="{Active: isActive(centro.nombre)}">
+      <span class="list-icon fa fa-line-chart"></span>
+      <span class="list-name">{{centro.nombre}}</span>
+  </button>
+</div>

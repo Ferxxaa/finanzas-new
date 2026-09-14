@@ -1,0 +1,74 @@
+.centro-etiqueta-form {
+    display: flex;
+    gap: 8px;
+}
+
+.centro-etiqueta-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.centro-etiqueta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #fff2a8;
+    border: 1px solid #e2cf61;
+    color: #5c4b00;
+    padding: 4px 8px;
+}
+
+.centro-etiqueta-editar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    color: #796b16;
+    background: transparent;
+    cursor: pointer;
+}
+
+.centro-etiqueta-editar:hover {
+    color: #0057a8;
+}
+
+.centro-etiqueta-eliminar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    color: #796b16;
+    background: transparent;
+    cursor: pointer;
+}
+
+.centro-etiqueta-eliminar:hover {
+    color: #b3261e;
+}
+
+.centro-etiqueta-editar mat-icon,
+.centro-etiqueta-eliminar mat-icon {
+    width: 17px;
+    height: 17px;
+    font-size: 17px;
+}
+.container {
+    margin: 0.5rem;
+}
+
+.row {
+    margin-bottom: 0.7rem;
+}
+
+.flex {
+    display: flex;
+    justify-content: center;
+}
+
+.flex button {
+    margin: 0.3rem;
+}

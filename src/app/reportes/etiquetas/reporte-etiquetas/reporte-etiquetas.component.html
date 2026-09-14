@@ -1,0 +1,83 @@
+﻿<div class="row reporte-etiquetas">
+  <div class="col-lg-12">
+    <section class="widget Max">
+      <header style="background-color: #555555">
+        <h4 style="color: white;">
+          <strong>Reporte de Etiquetas de Gasto</strong>
+        </h4>
+      </header>
+
+      <div class="widget-body">
+        <fieldset>
+          <legend></legend>
+
+          <div class="row align-items-end mb-3">
+            <div class="col-md-4">
+              <label class="mb-1"><strong>Centro de costo</strong></label>
+              <select class="form-control" [(ngModel)]="centroCostoSeleccionado" (ngModelChange)="CargarDetalle()">
+                <option [ngValue]="null">Todos los centros de costo</option>
+                <option *ngFor="let cc of (centrosCostos$ | async)" [ngValue]="cc.idCentroCosto">
+                  {{ cc.nombreCentroCosto }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-8 text-md-right mt-3 mt-md-0">
+              <div class="d-inline-block text-center px-3">
+                <div class="text-muted small">Pendiente</div>
+                <div class="h5 mb-0 text-warning">{{ totalPendiente | number:'1.0-0' }}</div>
+              </div>
+              <div class="d-inline-block text-center px-3">
+                <div class="text-muted small">Pagado</div>
+                <div class="h5 mb-0 text-success">{{ totalPagado | number:'1.0-0' }}</div>
+              </div>
+              <div class="d-inline-block text-center px-3">
+                <div class="text-muted small">Total</div>
+                <div class="h5 mb-0">{{ totalGeneral | number:'1.0-0' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="loading" class="text-center my-5">
+            <i class="fa fa-spinner fa-spin fa-2x"></i>
+            <p class="text-muted mt-2">Cargando detalle, puede tardar unos segundos...</p>
+          </div>
+
+          <div class="table-responsive" *ngIf="!loading">
+            <table class="table table-hover mb-0">
+              <thead class="thead-light">
+                <tr>
+                  <th>Etiqueta</th>
+                  <th>Descripción</th>
+                  <th>Centro de Costo</th>
+                  <th>Tipo</th>
+                  <th>Solicitante</th>
+                  <th>Fecha</th>
+                  <th class="text-right">Pendiente</th>
+                  <th class="text-right">Pagado</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of detalle">
+                  <td><span class="badge badge-info">{{ item.nombreEtiqueta }}</span></td>
+                  <td>{{ item.descripcion }}</td>
+                  <td>{{ item.nombreCentroCosto }}</td>
+                  <td><span class="badge" [ngClass]="tipoBadgeClass(item.tipoLabel)">{{ item.tipoLabel }}</span></td>
+                  <td>{{ item.solicitante }}</td>
+                  <td>{{ item.fecha | date:'dd-MM-yyyy' }}</td>
+                  <td class="text-right">{{ item.pendiente | number:'1.0-0' }}</td>
+                  <td class="text-right">{{ item.pagado | number:'1.0-0' }}</td>
+                  <td class="text-right"><strong>{{ item.total | number:'1.0-0' }}</strong></td>
+                </tr>
+                <tr *ngIf="!detalle?.length">
+                  <td colspan="9" class="text-center text-muted py-4">No hay datos para mostrar</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </fieldset>
+      </div>
+    </section>
+  </div>
+</div>

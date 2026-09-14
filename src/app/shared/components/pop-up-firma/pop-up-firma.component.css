@@ -1,0 +1,55 @@
+.firmas {
+    margin-top: 7em;
+}
+
+.Firma {
+    list-style: none;
+    padding-left: 0px;
+}
+
+.Firma li {
+    border: 1px solid rgb(99, 99, 99);
+    width: 200px;
+}
+
+.FloatRight {
+    float: right;
+}
+
+.FirmaImg {
+    top: 0;
+    right: 0%;
+    position: absolute;
+    max-width: 50%;
+    transform: translatey(-45%);
+}
+
+@media (max-width: 767px) {
+    .firmas {
+        margin-top: 2rem;
+    }
+
+    .firmas .row > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .firmas .row > [class*="col-"]:last-child {
+        margin-top: 1rem;
+    }
+
+    .FloatRight {
+        float: none;
+    }
+
+    .Firma li {
+        width: 100%;
+    }
+
+    .FirmaImg {
+        position: static;
+        max-width: 180px;
+        margin-top: 0.5rem;
+        transform: none;
+    }
+}

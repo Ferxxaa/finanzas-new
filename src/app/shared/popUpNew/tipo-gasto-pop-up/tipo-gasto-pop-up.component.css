@@ -1,0 +1,35 @@
+.etiqueta-label-row {
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid #e6e6e6;
+}
+
+.etiqueta-label {
+	letter-spacing: 0.2px;
+}
+
+.etiqueta-row {
+	align-items: center;
+	margin-bottom: 2px;
+}
+
+.etiqueta-helper {
+	color: #6c757d;
+	font-size: 12px;
+	text-align: right;
+}
+
+@media (max-width: 767px) {
+	.TipoGasto .row > [class*="col-"] {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.TipoGasto .row > [class*="col-"]:last-child {
+		margin-top: 0.5rem;
+	}
+
+	.etiqueta-helper {
+		text-align: left;
+	}
+}

@@ -1,0 +1,164 @@
+.mt10 {
+    margin-top: 10px;
+}
+
+
+.w100 {
+    width: 100%;
+    align-items: center;
+}
+
+.lista {
+    font-size: 0.5rem;
+}
+
+.icon {
+    width: 24px;
+}
+
+.pagada {
+    background-color: #f2f2f2;
+}
+
+.anulada {
+    background-color: rgb(255, 223, 223)
+}
+
+.cheque {
+    background-color: green;
+}
+
+.super {
+    z-index: 1;
+}
+
+.super2 {
+    z-index: 2;
+}
+
+.block {
+    display: block;
+}
+
+.mobile-label {
+    display: none;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6b6b6b;
+    margin-bottom: 0.25rem;
+}
+
+.condicion-item {
+    position: relative;
+}
+
+.condicion-columns > [class*="col-"] {
+    white-space: nowrap;
+}
+
+@media (max-width: 991px) {
+    .lista {
+        overflow-x: auto;
+        display: block;
+    }
+
+    .lista mat-list-item {
+        min-width: 760px;
+    }
+}
+
+@media (max-width: 767px) {
+    .CondicionPago > .row:first-child > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .CondicionPago > .row:first-child > [class*="col-"]:last-child {
+        margin-top: 0.5rem;
+    }
+
+    .lista {
+        overflow-x: visible;
+    }
+
+    .lista mat-list-item {
+        min-width: 0;
+        height: auto;
+        margin-bottom: 0.75rem;
+    }
+
+    .lista ::ng-deep .mat-list-item-content {
+        display: block;
+        height: auto;
+        padding: 0;
+    }
+
+    .condicion-table-head,
+    .lista ::ng-deep .condicion-table-head,
+    .lista ::ng-deep .condicion-table-head .mat-list-item-content {
+        display: none !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .condicion-item {
+        margin: 0;
+        padding: 0.9rem 0.85rem 0.6rem;
+        border: 1px solid #d8d8d8;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    .condicion-item > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 0.6rem;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .condicion-item > [class*="col-"]:last-child {
+        margin-bottom: 0;
+    }
+
+    .mobile-label {
+        display: block;
+    }
+
+    .campo-metodo,
+    .campo-acciones {
+        display: block !important;
+    }
+
+    .campo-metodo mat-select,
+    .campo-metodo mat-form-field,
+    .campo-numero-pago mat-form-field,
+    .campo-factura mat-form-field,
+    .campo-fecha .input-group {
+        width: 100%;
+    }
+
+    .campo-acciones {
+        text-align: right;
+    }
+
+    .campo-acciones .opciones {
+        margin-left: auto;
+    }
+
+    .campo-acciones .dropdown-menu {
+        left: auto;
+        right: 0;
+        min-width: 180px;
+    }
+
+    .pagada,
+    .anulada {
+        background-clip: padding-box;
+    }
+}

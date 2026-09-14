@@ -1,0 +1,245 @@
+.icon i {
+    color: white !important;
+}
+
+#sidebar {
+    background-color: #1a9702 !important;
+}
+
+.sidebar-nav-title {
+    color: white !important;
+}
+
+.sidebar-nav-title a {
+    color: inherit !important;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar-nav-title a:hover,
+.sidebar-nav-title a:focus {
+    color: inherit !important;
+    text-decoration: none;
+}
+
+li a {
+    color: white !important;
+}
+
+.sidebar-nav {
+    margin: 0;
+    padding: 10px 0;
+    font-size: 14px;
+}
+
+.sidebar-nav-tareas-title {
+    padding-top: 15px !important;
+    padding-bottom: 0 !important;
+}
+
+#sidebar-group-tareas .sidebar-nav {
+    padding-top: 0 !important;
+}
+
+.sidebar-nav-finanzas-title {
+    padding-top: 15px !important;
+    padding-bottom: 0 !important;
+}
+
+#sidebar-group-finanzas .sidebar-nav {
+    padding-top: 0 !important;
+}
+
+#sidebar-group-finanzas .sidebar-nav > li:first-child > a {
+    border-top: 0 !important;
+}
+
+.sidebar-nav-proyectos-title {
+    padding-top: 15px !important;
+    padding-bottom: 0 !important;
+}
+
+#sidebar-group-proyectos .sidebar-nav {
+    padding-top: 0 !important;
+}
+
+#sidebar-group-proyectos .sidebar-nav > li:first-child > a {
+    border-top: 0 !important;
+}
+
+.sidebar-nav-licitaciones-title {
+    padding-top: 15px !important;
+    padding-bottom: 0 !important;
+}
+
+#sidebar-group-licitaciones .sidebar-nav {
+    padding-top: 0 !important;
+}
+
+#sidebar-group-licitaciones .sidebar-nav > li:first-child > a {
+    border-top: 0 !important;
+}
+/* Mantiene el botón/título de Finanzas en verde aunque el sidebar esté gris en Home */
+a.sidebar-section-finanzas {
+    background-color: #169b00 !important;
+    color: white !important;
+    display: block;
+}
+
+a.sidebar-section-finanzas:hover,
+a.sidebar-section-finanzas:focus {
+    background-color: #169b00 !important;
+    color: white !important;
+    text-decoration: none;
+}
+
+/* Proyectos en azul */
+a.sidebar-section-proyectos {
+    background-color: #0879b2 !important;
+    color: white !important;
+    display: block;
+}
+
+a.sidebar-section-proyectos:hover,
+a.sidebar-section-proyectos:focus {
+    background-color: #0879b2 !important;
+    color: white !important;
+    text-decoration: none;
+}
+
+/* Las opciones principales de Proyectos usan azul; al desplegar una, queda oscura. */
+#sidebar-group-proyectos .sidebar-nav > li > a {
+    background-color: #2596d6 !important;
+    color: white !important;
+}
+
+#sidebar-group-proyectos .sidebar-nav > li > a[aria-expanded="true"] {
+    background-color: #151515 !important;
+    color: white !important;
+}
+
+/* Rutas internas de Proyectos en gris, como las demás configuraciones. */
+#sidebar-group-proyectos .sidebar-nav > li > ul {
+    background-color: #6e7178 !important;
+}
+
+#sidebar-group-proyectos .sidebar-nav > li > ul > li > a {
+    color: white !important;
+}
+
+#sidebar-group-proyectos .sidebar-nav > li > ul > li > a:hover,
+#sidebar-group-proyectos .sidebar-nav > li > ul > li > a:focus {
+    background-color: #585859 !important;
+    color: white !important;
+}
+
+/* Tareas en morado */
+a.sidebar-section-tareas {
+    background-color: #900090 !important;
+    color: white !important;
+    display: block;
+}
+
+a.sidebar-section-tareas:hover,
+a.sidebar-section-tareas:focus {
+    background-color: #900090 !important;
+    color: white !important;
+    text-decoration: none;
+}
+
+/* Las opciones principales de Tareas usan morado. */
+#sidebar-group-tareas .sidebar-nav > li > a {
+    background-color: #d565d5 !important;
+    color: white !important;
+}
+
+/* Licitaciones en naranjo */
+a.sidebar-section-licitaciones {
+    background-color: #ff891b !important;
+    color: white !important;
+    display: block;
+}
+
+a.sidebar-section-licitaciones:hover,
+a.sidebar-section-licitaciones:focus {
+    background-color: #ff891b !important;
+    color: white !important;
+    text-decoration: none;
+}
+
+/* Las opciones principales de Licitaciones usan naranjo; al desplegar una, queda oscura. */
+#sidebar-group-licitaciones .sidebar-nav > li > a {
+    background-color: #f4a953 !important;
+    color: white !important;
+}
+
+#sidebar-group-licitaciones .sidebar-nav > li > a[aria-expanded="true"] {
+    background-color: #151515 !important;
+    color: white !important;
+}
+
+/* Rutas internas de Licitaciones en gris, como las de Finanzas. */
+#sidebar-group-licitaciones .sidebar-nav > li > ul {
+    background-color: #6e7178 !important;
+}
+
+#sidebar-group-licitaciones .sidebar-nav > li > ul > li > a {
+    color: white !important;
+}
+
+#sidebar-group-licitaciones .sidebar-nav > li > ul > li > a:hover,
+#sidebar-group-licitaciones .sidebar-nav > li > ul > li > a:focus {
+    background-color: #585859 !important;
+    color: white !important;
+}
+
+/* Home en gris */
+a.sidebar-section-home {
+    background-color: #585859 !important;
+    color: white !important;
+    display: block;
+}
+
+a.sidebar-section-home:hover,
+a.sidebar-section-home:focus {
+    background-color: #585859 !important;
+    color: white !important;
+    text-decoration: none;
+}
+
+.sidebar-nav>li ul {
+    /* background-color: #26b809 !important; */
+    /* background-color: #4f5a5f !important; */
+    background-color: #6e7178 !important;
+}
+
+/* Variantes claras para las opciones internas de cada sección. */
+#sidebar-group-finanzas .sidebar-nav > li > a {
+    background-color: #57d549 !important;
+    color: white !important;
+}
+
+/* La opción abierta queda oscura y sus rutas permanecen en gris. */
+#sidebar-group-finanzas .sidebar-nav > li > a[aria-expanded="true"] {
+    background-color: #151515 !important;
+    color: white !important;
+}
+
+#sidebar-group-finanzas .sidebar-nav > li > ul {
+    background-color: #6e7178 !important;
+}
+
+#sidebar-group-finanzas .sidebar-nav > li > ul > li > a {
+    color: white !important;
+}
+
+#sidebar-group-finanzas .sidebar-nav > li > ul > li > a:hover,
+#sidebar-group-finanzas .sidebar-nav > li > ul > li > a:focus {
+    background-color: #585859 !important;
+    color: white !important;
+}
+
+.menu-badge {
+    float: right;
+    margin-top: 2px;
+}

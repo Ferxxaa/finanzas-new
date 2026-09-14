@@ -1,0 +1,11 @@
+@media (max-width: 767px) {
+	.centroCosto .row > [class*="col-"] {
+		flex: 0 0 100%;
+		max-width: 100%;
+		text-align: left;
+	}
+
+	.centroCosto .row > [class*="col-"]:last-child {
+		margin-top: 0.35rem;
+	}
+}

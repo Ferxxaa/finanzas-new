@@ -1,0 +1,54 @@
+<mat-card class="mobile-oc-card" [ngClass]="{
+  'bg-success text-white':ordenCompra.prioridad == '1',
+  'bg-warning text-dark':ordenCompra.prioridad == '2',
+  'bg-danger text-white':ordenCompra.prioridad == '3'
+}">
+  <mat-card-header>
+    <mat-card-title class="mb-1 font-weight-bold">
+      <div class="row card-title-row">
+        <div class="col-8 card-title-label">
+          Orden Compra
+        </div>
+        <div class="col-4 card-title-date">
+          {{ordenCompra.fechaCreacion | date:'dd/MM/yy':'UTC'}}
+        </div>
+      </div>
+    </mat-card-title>
+    <!-- [ngClass]="{
+      'text-white':ordenCompra.prioridad == '1',
+      'text-dark':ordenCompra.prioridad == '2',
+      'text-white':ordenCompra.prioridad == '3'
+    }" -->
+    <mat-card-subtitle class="font-weight-bold">
+      N°{{ordenCompra.folio}}
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content class="font-content">
+    <div class="card-field-grid">
+      <div class="card-field">
+        <div class="card-field-label">Proveedor</div>
+        <div class="card-field-value">{{ordenCompra.proveedor.nombre}}</div>
+      </div>
+      <div class="card-field">
+        <div class="card-field-label">Centro de Costo</div>
+        <div class="card-field-value">{{getCentroCosto()}}</div>
+      </div>
+      <div class="card-field">
+        <div class="card-field-label">Tipo Gasto</div>
+        <div class="card-field-value">{{getTipoGasto()}}</div>
+      </div>
+      <div class="card-field">
+        <div class="card-field-label">Subtipo Gasto</div>
+        <div class="card-field-value">{{getSubTipoGasto()}}</div>
+      </div>
+      <div class="card-field">
+        <div class="card-field-label">Metodo pago</div>
+        <div class="card-field-value">{{getMetodoPago()}}</div>
+      </div>
+      <div class="card-field card-field-highlight">
+        <div class="card-field-label">Monto</div>
+        <div class="card-field-value card-amount">$ {{retTotal(getEstadosPago()) | number : '1.0-0' | comatopoint}}</div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

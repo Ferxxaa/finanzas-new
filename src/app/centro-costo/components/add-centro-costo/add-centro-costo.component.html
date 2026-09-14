@@ -1,0 +1,61 @@
+<div class="cost-center-form">
+  <div class="form-grid">
+    <div class="form-field">
+      <label class="field-label" for="drdCentroCosto">Area de negocio</label>
+      <select id="drdCentroCosto" class="dropdown-toggle select2-chosen-2 form-control requiered"
+        [(ngModel)]="centroCosto.areaNegocio" name="drdCentroCosto">
+        <option value=0 selected>--- Seleccione una opcion ---</option>
+        <option *ngFor="let areaNegocio of areasNegocio$ | async; let i = index" value={{areaNegocio.idAreaNegocio}}>
+          {{areaNegocio.nombreAreaNegocio}}</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label class="field-label" for="txtSubccNombre">Centro de costo</label>
+      <input id="txtSubccNombre" class="form-control" type="text" placeholder="Nombre del centro"
+        name="txtSubccNombre" required [(ngModel)]="centroCosto.nombreCentroCosto">
+    </div>
+
+    <div class="form-field">
+      <label class="field-label" for="txtMontoProyectado">Monto proyectado</label>
+      <input id="txtMontoProyectado" class="form-control" type="number" placeholder="Monto proyectado"
+        name="txtMontoProyectado" required [(ngModel)]="centroCosto.montoProgramado">
+    </div>
+
+    <div class="form-field">
+      <label class="field-label" for="txtResponsable">Responsable</label>
+      <input id="txtResponsable" class="form-control" type="text" placeholder="--- Seleccione una opción ---"
+        list="Responsables" name="txtResponsable" required [(ngModel)]="centroCosto.responsable">
+      <datalist id="Responsables">
+        <option value="Jaime Olivares"></option>
+        <option value="Oscar Gómez"></option>
+        <option value="Orlando Cubillos"></option>
+      </datalist>
+    </div>
+  </div>
+
+  <div class="style-block">
+    <div class="style-grid">
+      <div class="form-field compact-field">
+        <label class="field-label" for="txtColorFondo">Color de fondo</label>
+        <input id="txtColorFondo" class="form-control color-input" type="color" name="txtColorFondo"
+          [(ngModel)]="centroCosto.fondo">
+      </div>
+
+      <div class="form-field compact-field">
+        <label class="field-label" for="txtColorLetras">Color de letras</label>
+        <input id="txtColorLetras" class="form-control color-input" type="color" name="txtColorLetras"
+          [(ngModel)]="centroCosto.letras">
+      </div>
+
+      <div class="preview-card" [ngStyle]="{'background-color':centroCosto.fondo, 'color':centroCosto.letras}">
+        <div class="preview-value">{{ centroCosto.nombreCentroCosto || 'Vista previa' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex form-actions">
+    <button class="btn btn-primary" (click)="addCentroCosto()">Guardar</button>
+    <button class="btn btn-secondary" (click)="Limpiar()">Limpiar</button>
+  </div>
+</div>

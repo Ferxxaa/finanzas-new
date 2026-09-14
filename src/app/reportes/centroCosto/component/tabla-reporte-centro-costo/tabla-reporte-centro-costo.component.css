@@ -1,0 +1,22 @@
+th{
+    background-color: #0070c0 !important;
+    color: white;
+    text-transform: capitalize !important;
+    font-weight: bold;
+}
+
+.right{
+    text-align: right;
+}
+
+.pointer{
+    cursor: pointer;
+}
+
+tbody tr.pointer:hover > td {
+    background-color: #fff2a8 !important;
+}
+
+.fleft{
+    float: left;
+}

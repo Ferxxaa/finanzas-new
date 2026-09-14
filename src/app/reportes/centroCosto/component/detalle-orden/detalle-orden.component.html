@@ -1,0 +1,101 @@
+<ng-template #NoData>
+    <app-pop-up-login-fixed></app-pop-up-login-fixed>
+</ng-template>
+
+<!-- <ul>
+    <li class="pointer text-danger" (click)="graph=true">
+        <b>Distribución Compra/Venta:
+        </b>
+        <mat-icon matTooltip="Ingresos y Egresos" [matTooltipPosition]="'above'">show_chart</mat-icon>
+    </li>
+</ul> -->
+<div class="detalle-centro-costo">
+    <div class="detalle-subseccion">
+        <div class="subtitulo etiquetas-toggle" role="button" tabindex="0" (click)="cargarEtiquetas()"
+            [attr.aria-expanded]="etiquetasVisibles" aria-controls="tabla-etiquetas">
+            <span class="etiquetas-titulo">
+                <mat-icon aria-hidden="true">label</mat-icon>
+                <strong>ETIQUETAS</strong>
+            </span>
+            <span class="etiquetas-chevron">
+                <mat-icon aria-hidden="true">{{ etiquetasVisibles ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </span>
+        </div>
+        <table id="tabla-etiquetas" *ngIf="etiquetasVisibles && etiquetasCargadas" class="table table-bordered table-striped table-hover no-footer">
+            <thead>
+                <tr>
+                    <th>Etiqueta</th>
+                    <th>Monto Total Gastado</th>
+                    <th>Porcentaje</th>
+                    <th>Utilidad</th>
+                    <th>Utilidad Mensual</th>
+                </tr>
+            </thead>
+            <tbody *ngIf="(etiquetaTotales$ | async) as etiquetaTotales; else NoData">
+                <ng-container *ngIf="(etiquetaDetalle$ | async) as etiquetaDetalle">
+                    <tr *ngFor="let etiqueta of etiquetaTotales || []" class="pointer etiqueta-row" (click)="toggleEtiqueta(etiqueta)">
+                        <td *ngIf="etiqueta">
+                            <mat-icon aria-hidden="false" aria-label="Desplegar">{{ etiqueta.view ? 'indeterminate_check_box' : 'add_box' }}</mat-icon>
+                            {{ etiqueta.nombreEtiqueta }}
+                        </td>
+                        <td *ngIf="etiqueta" class="right">${{ etiqueta.total | number: '1.0-0' | comatopoint }}</td>
+                        <td *ngIf="etiqueta" class="right">{{ totalOC ? (etiqueta.total * 100 / totalOC | number: '1.0-2' | comatopoint) : 0 }}%</td>
+                        <td *ngIf="etiqueta" class="right">${{ etiqueta.utilidad | number: '1.0-0' | comatopoint }}</td>
+                        <td *ngIf="etiqueta" class="right">${{ etiqueta.utilidadMensual | number: '1.0-0' | comatopoint }}</td>
+                    </tr>
+                    <ng-container *ngFor="let etiqueta of etiquetaTotales || []">
+                        <ng-container *ngIf="etiqueta && etiqueta.view">
+                            <tr *ngFor="let detalle of getDetallePorEtiqueta(etiqueta, etiquetaDetalle)" class="sub-row">
+                                <td class="pl-4">{{ detalle.label }}</td>
+                                <td class="right">${{ detalle.total | number: '1.0-0' | comatopoint }}</td>
+                                <td class="right">{{ etiqueta.total ? (detalle.total * 100 / etiqueta.total | number: '1.0-2' | comatopoint) : 0 }}%</td>
+                            </tr>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="detalle-subseccion mt-3">
+        <div class="subtitulo">TIPO</div>
+        <table class="table table-bordered table-striped table-hover no-footer">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Monto Gastado</th>
+                    <th>Porcentaje</th>
+                </tr>
+            </thead>
+            <tbody *ngIf="tiposGasto$ | async as tipoGasto else NoData">
+                <ng-container *ngFor="let item of tipoGasto | addView">
+                    <ng-container>
+                        <tr class="tipoGasto bold" (click)="item.view= !item.view">
+                            <td>
+                                <mat-icon aria-hidden="false" aria-label="Desplegar">add_box</mat-icon>
+                                {{item.nombreTipoGasto}}
+                            </td>
+                            <td class="right">$
+                                {{item.totalTipoGasto | number: '1.0-0' | comatopoint}}</td>
+                            <td class="right">{{totalOC ? (item.totalTipoGasto * 100 / totalOC | number: '1.0-2' | comatopoint) : 0}}%</td>
+                        </tr>
+                        <ng-container *ngIf="item.view">
+                            <ng-container *ngFor="let subTipoGasto of item.detalleSubTipoGasto">
+                                <tr>
+                                    <td>{{subTipoGasto.nombreSubTipoGasto}}</td>
+                                    <td class="right">$
+                                        {{subTipoGasto.totalSubTipoGasto | number: '1.0-0' | comatopoint}}</td>
+                                    <td class="right">{{item.totalTipoGasto ? (subTipoGasto.totalSubTipoGasto * 100 / item.totalTipoGasto
+                                        | number: '1.0-2' | comatopoint) : 0}}%</td>
+                                </tr>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<app-pop-up-ventas-compras-centro-costo *ngIf="graph" (cerrar)="graph=false"
+    [nombreCentro]="nombreCentroCosto"></app-pop-up-ventas-compras-centro-costo>

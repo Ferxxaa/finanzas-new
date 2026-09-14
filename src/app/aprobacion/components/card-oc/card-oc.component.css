@@ -1,0 +1,154 @@
+.font-content{
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+.mobile-oc-card {
+    width: 100%;
+}
+
+.mobile-oc-card .mat-card-header {
+    margin-bottom: 8px;
+}
+
+.mobile-oc-card .mat-card-title,
+.mobile-oc-card .mat-card-subtitle {
+    margin-bottom: 0;
+}
+
+.card-title-date,
+.card-amount {
+    text-align: right;
+}
+
+.card-col {
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.card-field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-column-gap: 8px;
+    grid-row-gap: 6px;
+}
+
+.card-field {
+    min-width: 0;
+    padding: 3px 5px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.card-field-label {
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 2px;
+    letter-spacing: 0.06em;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.card-field-value {
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.card-field-highlight .card-field-value {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+@media (max-width: 575px) {
+    .mobile-oc-card {
+        padding: 12px;
+    }
+
+    .card-title-row,
+    .card-row-label,
+    .card-row-value {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+    }
+
+    .card-row-label .card-col,
+    .card-row-value .card-col {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding-left: 6px;
+        padding-right: 6px;
+        font-size: 11px;
+    }
+
+    .card-title-date,
+    .card-amount {
+        margin-top: 0;
+    }
+
+    .card-row-label {
+        margin-top: 0.45rem;
+        margin-bottom: 0.05rem;
+    }
+
+    .card-row-value {
+        margin-bottom: 0.2rem;
+    }
+
+    .font-content {
+        font-size: 11px;
+    }
+
+    .card-field-grid {
+        grid-column-gap: 6px;
+        grid-row-gap: 5px;
+    }
+
+    .card-field {
+        padding: 3px 4px;
+    }
+
+    .card-field-label {
+        font-size: 9px;
+        margin-bottom: 2px;
+    }
+
+    .card-field-value {
+        font-size: 11px;
+    }
+
+    .card-field-highlight .card-field-value {
+        font-size: 12px;
+    }
+
+    .mobile-oc-card .mat-card-header-text {
+        margin: 0;
+        width: 100%;
+    }
+
+    .mobile-oc-card .mat-card-title {
+        font-size: 13px;
+        line-height: 1.2;
+    }
+
+    .mobile-oc-card .mat-card-subtitle {
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    .card-title-label,
+    .card-title-date {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+    .card-amount {
+        text-align: left;
+    }
+}
