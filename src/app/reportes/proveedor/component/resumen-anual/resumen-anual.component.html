@@ -23,7 +23,15 @@
                 <tbody>
                     <tr>
                         <td>Productos</td>
-                        <td></td>
+                        <td class="center" [ngClass]="{
+                          'text-success': reporteProductos.general > 2.55,
+                          'text-warning': reporteProductos.general <= 2.55 && reporteProductos.general > 1.8,
+                          'text-danger': reporteProductos.general <= 1.8
+                        }">
+                          <span *ngIf="reporteProductos.general > 2.54">A</span>
+                          <span *ngIf="reporteProductos.general > 1.80 && reporteProductos.general < 2.55">B</span>
+                          <span *ngIf="reporteProductos.general < 1.81">C</span>
+                        </td>
                         <td>{{reporteProductos.general | number:'1.2-2'}}</td>
                         <td>{{reporteProductos.promedio | number:'1.2-2'}}</td>
                         <td>{{reporteProductos.cantidadProveedores}}</td>
@@ -31,7 +39,15 @@
                     </tr>
                     <tr>
                       <td>Servicio</td>
-                        <td></td>
+                        <td class="center" [ngClass]="{
+                          'text-success': reporteServicios.general > 2.55,
+                          'text-warning': reporteServicios.general <= 2.55 && reporteServicios.general > 1.8,
+                          'text-danger': reporteServicios.general <= 1.8
+                        }">
+                          <span *ngIf="reporteServicios.general > 2.54">A</span>
+                          <span *ngIf="reporteServicios.general > 1.80 && reporteServicios.general < 2.55">B</span>
+                          <span *ngIf="reporteServicios.general < 1.81">C</span>
+                        </td>
                         <td>{{reporteServicios.general | number:'1.2-2'}}</td>
                         <td>{{reporteServicios.promedio | number:'1.2-2'}}</td>
                         <td>{{reporteServicios.cantidadProveedores}}</td>
@@ -39,7 +55,15 @@
                     </tr>
                     <tr>
                       <td>SubContrato</td>
-                        <td></td>
+                        <td class="center" [ngClass]="{
+                          'text-success': reporteSubcontrato.general > 2.55,
+                          'text-warning': reporteSubcontrato.general <= 2.55 && reporteSubcontrato.general > 1.8,
+                          'text-danger': reporteSubcontrato.general <= 1.8
+                        }">
+                          <span *ngIf="reporteSubcontrato.general > 2.54">A</span>
+                          <span *ngIf="reporteSubcontrato.general > 1.80 && reporteSubcontrato.general < 2.55">B</span>
+                          <span *ngIf="reporteSubcontrato.general < 1.81">C</span>
+                        </td>
                         <td>{{reporteSubcontrato.general | number:'1.2-2'}}</td>
                         <td>{{reporteSubcontrato.promedio | number:'1.2-2'}}</td>
                         <td>{{reporteSubcontrato.cantidadProveedores}}</td>
