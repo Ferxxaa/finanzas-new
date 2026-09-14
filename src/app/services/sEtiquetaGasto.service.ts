@@ -21,6 +21,8 @@ export class etiquetaGastoService {
     private movimientosCache$: Observable<any[]>;
     private cajasChicasCache$: Observable<any[]>;
     private usuariosCache$: Observable<any[]>;
+    private cuentaCorrienteConfirmadosCache$: Observable<any[]>;
+    private cuentaCorrientePendientesCache$: Observable<any[]>;
 
     constructor(
         private http: Http,
@@ -480,8 +482,8 @@ export class etiquetaGastoService {
         return Observable.forkJoin(
             this.http.get(environment.nest + 'v1/viewCentroCosto/centroCosto/confirmados/' + idCentroCosto),
             this.http.get(environment.nest + 'v1/viewCentroCosto/centroCosto/pendientes/' + idCentroCosto),
-            this.cuentaCorrienteService.getCuentaCorrienteConfirmados(),
-            this.cuentaCorrienteService.getCuentaCorrientePendientes()
+            this.getCuentaCorrienteConfirmadosCache(),
+            this.getCuentaCorrientePendientesCache()
         ).map(([confirmadosRes, pendientesRes, ccConfirmados, ccPendientes]: any[]) => {
             const base = [confirmadosRes, pendientesRes].reduce((movimientos, respuesta) => {
                 const filas = respuesta.json() || [];
@@ -520,6 +522,24 @@ export class etiquetaGastoService {
 
             return base.concat(contratos);
         });
+    }
+
+    private getCuentaCorrienteConfirmadosCache(): Observable<any[]> {
+        if (!this.cuentaCorrienteConfirmadosCache$) {
+            this.cuentaCorrienteConfirmadosCache$ = this.cuentaCorrienteService
+                .getCuentaCorrienteConfirmados()
+                .shareReplay(1);
+        }
+        return this.cuentaCorrienteConfirmadosCache$;
+    }
+
+    private getCuentaCorrientePendientesCache(): Observable<any[]> {
+        if (!this.cuentaCorrientePendientesCache$) {
+            this.cuentaCorrientePendientesCache$ = this.cuentaCorrienteService
+                .getCuentaCorrientePendientes()
+                .shareReplay(1);
+        }
+        return this.cuentaCorrientePendientesCache$;
     }
 
     private getMovimientos(): Observable<any[]> {
