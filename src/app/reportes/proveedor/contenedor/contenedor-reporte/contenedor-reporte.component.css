@@ -120,3 +120,11 @@ ul{
     width: auto !important;
     min-width: 90px;
 }
+::ng-deep .subtitulos.padTitle {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    width: 160px;
+    margin: 0 auto;
+}

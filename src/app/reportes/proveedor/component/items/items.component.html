@@ -1,5 +1,7 @@
 <li class="subtitulos padTitle pointer" (click)="view=!view">
-    <mat-icon aria-hidden="false" aria-label="Desplegar" class="fleft">add_box</mat-icon> {{titulo}}
+    <span class="titulo-seccion">
+        <mat-icon aria-hidden="false" aria-label="Desplegar" class="fleft">add_box</mat-icon> {{titulo}}
+    </span>
 </li>
 <ng-container *ngIf="view">
     <li *ngFor="let item of reportEvalProv | filtroItem:filtro; let i = index" class="contenido_tabla" (click)="clicked[i] = !clicked[i]">
