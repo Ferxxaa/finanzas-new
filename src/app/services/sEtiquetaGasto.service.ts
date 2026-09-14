@@ -503,7 +503,7 @@ export class etiquetaGastoService {
             const nombreCentroCosto = base.length ? base[0].centroCosto.nombreCentroCosto : null;
 
             const contratos = (nombreCentroCosto ? (ccConfirmados || []).concat(ccPendientes || []) : [])
-                .filter((fila: any) => Number(fila.tipoOC) === 5 && fila.nombreCentroCosto === nombreCentroCosto)
+                .filter((fila: any) => (Number(fila.tipoOC) === 5 || Number(fila.tipoOC) === 3) && fila.nombreCentroCosto === nombreCentroCosto)
                 .map((fila: any) => ({
                     idMovimiento: fila.idMovimiento,
                     centroCosto: {
