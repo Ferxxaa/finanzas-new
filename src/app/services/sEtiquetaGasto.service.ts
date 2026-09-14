@@ -9,6 +9,7 @@ import * as firebase from 'firebase';
 import { EtiquetaGasto } from '../models/nestEtiquetaGasto';
 import { environment } from '../../environments/environment';
 import { sVis_UsuarioPersona } from './sVis_UsuarioPersona.service';
+import { SCuentaCorrienteService } from './s-cuenta-corriente.service';
 
 @Injectable()
 export class etiquetaGastoService {
@@ -23,7 +24,8 @@ export class etiquetaGastoService {
 
     constructor(
         private http: Http,
-        private usuarioService: sVis_UsuarioPersona
+        private usuarioService: sVis_UsuarioPersona,
+        private cuentaCorrienteService: SCuentaCorrienteService
     ) { }
 
     init(idCentroCosto?: number): EtiquetaGasto {
@@ -327,6 +329,7 @@ export class etiquetaGastoService {
                     case 1: return 'Orden de Compra';
                     case 2: return 'Egreso';
                     case 3: return 'Ingreso';
+                    case 5: return 'Contrato';
                     default: return 'Otro';
                 }
             };
@@ -476,9 +479,11 @@ export class etiquetaGastoService {
     private getMovimientosPorCentroCosto(idCentroCosto: number): Observable<any[]> {
         return Observable.forkJoin(
             this.http.get(environment.nest + 'v1/viewCentroCosto/centroCosto/confirmados/' + idCentroCosto),
-            this.http.get(environment.nest + 'v1/viewCentroCosto/centroCosto/pendientes/' + idCentroCosto)
-        ).map((respuestas: Response[]) => {
-            return respuestas.reduce((movimientos, respuesta) => {
+            this.http.get(environment.nest + 'v1/viewCentroCosto/centroCosto/pendientes/' + idCentroCosto),
+            this.cuentaCorrienteService.getCuentaCorrienteConfirmados(),
+            this.cuentaCorrienteService.getCuentaCorrientePendientes()
+        ).map(([confirmadosRes, pendientesRes, ccConfirmados, ccPendientes]: any[]) => {
+            const base = [confirmadosRes, pendientesRes].reduce((movimientos, respuesta) => {
                 const filas = respuesta.json() || [];
                 return movimientos.concat(filas.map((fila: any) => ({
                     idMovimiento: fila.idMovimiento,
@@ -494,6 +499,26 @@ export class etiquetaGastoService {
                     estadoPago: [{ estado: fila.estado, monto: fila.monto }]
                 })));
             }, []);
+
+            const nombreCentroCosto = base.length ? base[0].centroCosto.nombreCentroCosto : null;
+
+            const contratos = (nombreCentroCosto ? (ccConfirmados || []).concat(ccPendientes || []) : [])
+                .filter((fila: any) => Number(fila.tipoOC) === 5 && fila.nombreCentroCosto === nombreCentroCosto)
+                .map((fila: any) => ({
+                    idMovimiento: fila.idMovimiento,
+                    centroCosto: {
+                        idCentroCosto: idCentroCosto,
+                        nombreCentroCosto: fila.nombreCentroCosto
+                    },
+                    tipo: fila.tipoOC,
+                    tipoGasto: { nombreTipoGasto: fila.nombreTipoGasto },
+                    subTipoGasto: { nombreSubTipoGasto: fila.nombreSubTipoGasto },
+                    descripcion: fila.descripcion,
+                    fechaCreacion: fila.fechaPago,
+                    estadoPago: [{ estado: fila.estado, monto: fila.monto }]
+                }));
+
+            return base.concat(contratos);
         });
     }
 

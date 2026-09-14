@@ -222,6 +222,7 @@ import { etiquetaGastoService } from './services/sEtiquetaGasto.service';
 import { ReporteEtiquetasComponent } from './reportes/etiquetas/reporte-etiquetas/reporte-etiquetas.component';
 import { EvaluacionMasivaComponent } from "./proveedor/components/evaluacion-masiva/evaluacion-masiva.component";
 import { reporteOperacionalService } from './services/Nest/reporteOperacional.service';
+import { SCuentaCorrienteService } from './services/s-cuenta-corriente.service';
 
 //Componentes
 
@@ -431,8 +432,7 @@ import { reporteOperacionalService } from './services/Nest/reporteOperacional.se
     AngularFirestoreModule
     // AprobacionModule
   ],
-  providers: [reporteOperacionalService, sMonedas, sVis_UsuarioPersona, etiquetaGastoService],
+  providers: [reporteOperacionalService, sMonedas, sVis_UsuarioPersona, etiquetaGastoService, SCuentaCorrienteService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }
-

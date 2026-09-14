@@ -25,6 +25,8 @@
             <thead>
                 <tr>
                     <th>Etiqueta</th>
+                    <th>Contratos</th>
+                    <th>IVA</th>
                     <th>Monto Total Gastado</th>
                     <th>Porcentaje</th>
                     <th>Utilidad</th>
@@ -38,6 +40,8 @@
                             <mat-icon aria-hidden="false" aria-label="Desplegar">{{ etiqueta.view ? 'indeterminate_check_box' : 'add_box' }}</mat-icon>
                             {{ etiqueta.nombreEtiqueta }}
                         </td>
+                        <td *ngIf="etiqueta" class="right">${{ etiqueta.contratos | number: '1.0-0' | comatopoint }}</td>
+                        <td *ngIf="etiqueta" class="right">${{ etiqueta.iva | number: '1.0-0' | comatopoint }}</td>
                         <td *ngIf="etiqueta" class="right">${{ etiqueta.total | number: '1.0-0' | comatopoint }}</td>
                         <td *ngIf="etiqueta" class="right">{{ totalOC ? (etiqueta.total * 100 / totalOC | number: '1.0-2' | comatopoint) : 0 }}%</td>
                         <td *ngIf="etiqueta" class="right">${{ etiqueta.utilidad | number: '1.0-0' | comatopoint }}</td>

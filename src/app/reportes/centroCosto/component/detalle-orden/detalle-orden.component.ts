@@ -93,7 +93,7 @@ export class DetalleOrdenComponent implements OnInit {
         totals[key].pagado += Number(fila.pagado || 0);
         totals[key].total += Number(fila.total || 0);
 
-        if (Number(fila.tipo) === 3) {
+        if (Number(fila.tipo) === 3 || Number(fila.tipo) === 5) {
           totals[key].ingresos += Number(fila.total || 0);
         } else {
           totals[key].gastos += Number(fila.total || 0);
@@ -105,6 +105,8 @@ export class DetalleOrdenComponent implements OnInit {
           const etiqueta = totals[key];
           etiqueta.utilidad = etiqueta.ingresos - etiqueta.gastos;
           etiqueta.utilidadMensual = this.duracion ? etiqueta.utilidad / Number(this.duracion) : 0;
+          etiqueta.contratos = etiqueta.ingresos;
+          etiqueta.iva = etiqueta.ingresos * 0.19;
           return etiqueta;
         })
         .sort((a, b) => a.nombreEtiqueta.localeCompare(b.nombreEtiqueta));
