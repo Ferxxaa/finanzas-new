@@ -14,11 +14,13 @@
             <div class="widget-body">
                 <fieldset>
                     <legend></legend>
-                    <div class="row">
-                        <div class="col-4">
-                            <app-colores-evaluacion></app-colores-evaluacion>
+                    <div class="row contenedor-reporte-layout">
+                        <div class="col-5">
+                            <div class="contenedor-reporte-colores">
+                                <app-colores-evaluacion></app-colores-evaluacion>
+                            </div>
                         </div>
-                        <div class="col-8">
+                        <div class="col-7 contenedor-reporte-filtro">
                             <app-filtro (emitAgno)="changeYear($event)"></app-filtro>
                         </div>
                     </div>
@@ -34,15 +36,8 @@
                                         [reportEvalProv]="reportEvalProv"></app-items>
                                     <app-items [filtro]="[3]" [titulo]="'Subcontratos'" [agno]="agno"
                                         [reportEvalProv]="reportEvalProv"></app-items>
-                                        <app-totales-items [reportEvalProv]="reportEvalProv"></app-totales-items>
+                                    <app-totales-items [reportEvalProv]="reportEvalProv"></app-totales-items>
                                 </ng-container>
-                                <!-- <app-items [agno]="agno" [filtro]="['1']" [titulo]="'Productos'"
-                                    (loading)="load($event,0)"></app-items>
-                                <app-items [agno]="agno" [filtro]="['2']" [titulo]="'Servicios'"
-                                    (loading)="load($event,1)"></app-items>
-                                <app-items [agno]="agno" [filtro]="['3']" [titulo]="'Subcontratos'"
-                                    (loading)="load($event,2)"></app-items>
-                                <app-totales-items [agno]="agno"></app-totales-items> -->
                             </ul>
                         </div>
                     </div>
@@ -51,5 +46,3 @@
         </section>
     </div>
 </div>
-
-<!-- <app-loading *ngIf="cargando()"></app-loading> -->
