@@ -21,38 +21,53 @@
                 <mat-icon aria-hidden="true">{{ etiquetasVisibles ? 'expand_less' : 'expand_more' }}</mat-icon>
             </span>
         </div>
-        <table id="tabla-etiquetas" *ngIf="etiquetasVisibles && etiquetasCargadas" class="table table-bordered table-striped table-hover no-footer">
+        <table id="tabla-etiquetas" *ngIf="etiquetasVisibles && etiquetasCargadas" class="table table-bordered table-striped table-hover no-footer tabla-cc-alineada">
+            <colgroup>
+                <col style="width: 9%">
+                <col style="width: 5%">
+                <col style="width: 12%">
+                <col style="width: 9%">
+                <col style="width: 8%">
+                <col style="width: 9%">
+                <col style="width: 9%">
+                <col style="width: 8%">
+                <col style="width: 5%">
+                <col style="width: 8%">
+                <col style="width: 5%">
+                <col style="width: 8%">
+                <col style="width: 5%">
+            </colgroup>
             <thead>
                 <tr>
-                    <th>Etiqueta</th>
+                    <th colspan="3">Etiqueta</th>
                     <th>Contratos</th>
                     <th>IVA</th>
-                    <th>Monto Total Gastado</th>
-                    <th>Porcentaje</th>
-                    <th>Utilidad</th>
-                    <th>Utilidad Mensual</th>
+                    <th colspan="2">Monto Total Gastado</th>
+                    <th colspan="2">Porcentaje</th>
+                    <th colspan="2">Utilidad</th>
+                    <th colspan="2">Utilidad Mensual</th>
                 </tr>
             </thead>
             <tbody *ngIf="(etiquetaTotales$ | async) as etiquetaTotales; else NoData">
                 <ng-container *ngIf="(etiquetaDetalle$ | async) as etiquetaDetalle">
                     <tr *ngFor="let etiqueta of etiquetaTotales || []" class="pointer etiqueta-row" (click)="toggleEtiqueta(etiqueta)">
-                        <td *ngIf="etiqueta">
+                        <td *ngIf="etiqueta" colspan="3">
                             <mat-icon aria-hidden="false" aria-label="Desplegar">{{ etiqueta.view ? 'indeterminate_check_box' : 'add_box' }}</mat-icon>
                             {{ etiqueta.nombreEtiqueta }}
                         </td>
                         <td *ngIf="etiqueta" class="right">${{ etiqueta.contratos | number: '1.0-0' | comatopoint }}</td>
                         <td *ngIf="etiqueta" class="right">${{ etiqueta.iva | number: '1.0-0' | comatopoint }}</td>
-                        <td *ngIf="etiqueta" class="right">${{ etiqueta.total | number: '1.0-0' | comatopoint }}</td>
-                        <td *ngIf="etiqueta" class="right">{{ totalOC ? (etiqueta.total * 100 / totalOC | number: '1.0-2' | comatopoint) : 0 }}%</td>
-                        <td *ngIf="etiqueta" class="right">${{ etiqueta.utilidad | number: '1.0-0' | comatopoint }}</td>
-                        <td *ngIf="etiqueta" class="right">${{ etiqueta.utilidadMensual | number: '1.0-0' | comatopoint }}</td>
+                        <td *ngIf="etiqueta" class="right" colspan="2">${{ etiqueta.total | number: '1.0-0' | comatopoint }}</td>
+                        <td *ngIf="etiqueta" class="right" colspan="2">{{ totalOC ? (etiqueta.total * 100 / totalOC | number: '1.0-2' | comatopoint) : 0 }}%</td>
+                        <td *ngIf="etiqueta" class="right" colspan="2">${{ etiqueta.utilidad | number: '1.0-0' | comatopoint }}</td>
+                        <td *ngIf="etiqueta" class="right" colspan="2">${{ etiqueta.utilidadMensual | number: '1.0-0' | comatopoint }}</td>
                     </tr>
                     <ng-container *ngFor="let etiqueta of etiquetaTotales || []">
                         <ng-container *ngIf="etiqueta && etiqueta.view">
                             <tr *ngFor="let detalle of getDetallePorEtiqueta(etiqueta, etiquetaDetalle)" class="sub-row">
-                                <td class="pl-4">{{ detalle.label }}</td>
-                                <td class="right">${{ detalle.total | number: '1.0-0' | comatopoint }}</td>
-                                <td class="right">{{ etiqueta.total ? (detalle.total * 100 / etiqueta.total | number: '1.0-2' | comatopoint) : 0 }}%</td>
+                                <td class="pl-4" colspan="9">{{ detalle.label }}</td>
+                                <td class="right" colspan="2">${{ detalle.total | number: '1.0-0' | comatopoint }}</td>
+                                <td class="right" colspan="2">{{ etiqueta.total ? (detalle.total * 100 / etiqueta.total | number: '1.0-2' | comatopoint) : 0 }}%</td>
                             </tr>
                         </ng-container>
                     </ng-container>

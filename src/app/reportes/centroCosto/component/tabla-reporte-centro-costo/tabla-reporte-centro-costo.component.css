@@ -20,3 +20,13 @@ tbody tr.pointer:hover > td {
 .fleft{
     float: left;
 }
+.tabla-cc-alineada {
+  table-layout: fixed;
+  width: 100%;
+}
+ 
+.tabla-cc-alineada th,
+.tabla-cc-alineada td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
