@@ -201,7 +201,7 @@ ul {
     color: white;
 }
 
-.ingreso div:nth-child(n+8),
+.ingreso div:nth-child(n+8):not(:nth-child(10)),
 .ingreso div:nth-child(-n+6) {
     background-color: rgba(0, 255, 0, 0.397) !important;
 }
