@@ -97,7 +97,8 @@
                     class="text-warning fa fa-exclamation-triangle"></i>
             </div>
             <div *ngIf="flujo.nombreEtiquetaGasto; else referenciaSinEtiqueta"
-                [ngStyle]="getReferenciaStyle(flujo)">
+                class="referencia-etiqueta"
+                [ngStyle]="{'color': flujo.letras || flujo.colorLetrasSTP || '#000000', 'background-color': flujo.fondo || flujo.colorFondoSTP || 'transparent'}">
                 {{flujo.nombreEtiquetaGasto}}
             </div>
             <ng-template #referenciaSinEtiqueta>
