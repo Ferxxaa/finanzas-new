@@ -11,8 +11,7 @@ import { TipoGastoPopUpComponent } from '../tipo-gasto-pop-up/tipo-gasto-pop-up.
   templateUrl: './directo-ingreso-pop-up.component.html',
   styleUrls: ['./directo-ingreso-pop-up.component.css'],
   providers:[
-    sMovimientoService,
-    etiquetaGastoService
+    sMovimientoService
   ]
 })
 export class DirectoIngresoPopUpComponent implements OnInit {

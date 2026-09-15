@@ -59,8 +59,8 @@
                         <td *ngIf="etiqueta" class="right">${{ etiqueta.iva | number: '1.0-0' | comatopoint }}</td>
                         <td *ngIf="etiqueta" class="right" colspan="2">${{ etiqueta.total | number: '1.0-0' | comatopoint }}</td>
                         <td *ngIf="etiqueta" class="right" colspan="2">{{ totalOC ? (etiqueta.total * 100 / totalOC | number: '1.0-2' | comatopoint) : 0 }}%</td>
-                        <td *ngIf="etiqueta" class="right" colspan="2">${{ etiqueta.utilidad | number: '1.0-0' | comatopoint }}</td>
-                        <td *ngIf="etiqueta" class="right" colspan="2">${{ etiqueta.utilidadMensual | number: '1.0-0' | comatopoint }}</td>
+                        <td *ngIf="etiqueta" class="right" colspan="2" [ngClass]="{'text-danger': etiqueta.utilidad < 0}">${{ etiqueta.utilidad | number: '1.0-0' | comatopoint }}</td>
+                        <td *ngIf="etiqueta" class="right" colspan="2" [ngClass]="{'text-danger': etiqueta.utilidadMensual < 0}">${{ etiqueta.utilidadMensual | number: '1.0-0' | comatopoint }}</td>
                     </tr>
                     <ng-container *ngFor="let etiqueta of etiquetaTotales || []">
                         <ng-container *ngIf="etiqueta && etiqueta.view">
