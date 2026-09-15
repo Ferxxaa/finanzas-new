@@ -89,13 +89,14 @@ export class DetalleOrdenComponent implements OnInit {
           };
         }
 
-        totals[key].pendiente += Number(fila.pendiente || 0);
-        totals[key].pagado += Number(fila.pagado || 0);
-        totals[key].total += Number(fila.total || 0);
+        const esIngreso = Number(fila.tipo) === 3 || Number(fila.tipo) === 5;
 
-        if (Number(fila.tipo) === 3 || Number(fila.tipo) === 5) {
+        if (esIngreso) {
           totals[key].ingresos += Number(fila.total || 0);
         } else {
+          totals[key].pendiente += Number(fila.pendiente || 0);
+          totals[key].pagado += Number(fila.pagado || 0);
+          totals[key].total += Number(fila.total || 0);
           totals[key].gastos += Number(fila.total || 0);
         }
       });
