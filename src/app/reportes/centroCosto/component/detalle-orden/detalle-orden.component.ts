@@ -132,7 +132,7 @@ export class DetalleOrdenComponent implements OnInit {
 
     const resumen = {};
 
-    (filas || []).filter((fila) => fila && fila.nombreEtiqueta === etiqueta.nombreEtiqueta).forEach((fila) => {
+    (filas || []).filter((fila) => fila && fila.nombreEtiqueta === etiqueta.nombreEtiqueta && Number(fila.tipo) !== 3 && Number(fila.tipo) !== 5).forEach((fila) => {
       const key = fila.nombreTipoGasto || fila.tipoLabel || 'Otro';
       if (!resumen[key]) {
         resumen[key] = { label: key, total: 0 };
