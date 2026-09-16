@@ -27,9 +27,27 @@ li a {
 }
 
 .sidebar-nav {
-    margin: 0;
-    padding: 10px 0;
+    margin: 0 !important;
+    padding: 0 !important;
     font-size: 14px;
+}
+
+/* Fondo de respaldo por grupo: si queda algún resquicio de margen/padding,
+   que se vea del color de esa sección y no el verde base del #sidebar */
+#sidebar-group-proyectos {
+    background-color: #2596d6 !important;
+}
+
+#sidebar-group-tareas {
+    background-color: #d565d5 !important;
+}
+
+#sidebar-group-licitaciones {
+    background-color: #f4a953 !important;
+}
+
+#sidebar-group-finanzas {
+    background-color: #57d549 !important;
 }
 
 .sidebar-nav-tareas-title {
@@ -48,6 +66,7 @@ li a {
 
 #sidebar-group-finanzas .sidebar-nav {
     padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 #sidebar-group-finanzas .sidebar-nav > li:first-child > a {
@@ -61,6 +80,7 @@ li a {
 
 #sidebar-group-proyectos .sidebar-nav {
     padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 #sidebar-group-proyectos .sidebar-nav > li:first-child > a {
@@ -74,11 +94,13 @@ li a {
 
 #sidebar-group-licitaciones .sidebar-nav {
     padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 #sidebar-group-licitaciones .sidebar-nav > li:first-child > a {
     border-top: 0 !important;
 }
+
 /* Mantiene el botón/título de Finanzas en verde aunque el sidebar esté gris en Home */
 a.sidebar-section-finanzas {
     background-color: #169b00 !important;
@@ -107,30 +129,39 @@ a.sidebar-section-proyectos:focus {
     text-decoration: none;
 }
 
-/* Las opciones principales de Proyectos usan azul; al desplegar una, queda oscura. */
-#sidebar-group-proyectos .sidebar-nav > li > a {
+/* Todos los ítems de Proyectos (sin importar cuántos <ul> los envuelvan) en azul claro */
+#sidebar-group-proyectos .sidebar-nav li a {
     background-color: #2596d6 !important;
-    color: white !important;
+    color: black !important;
 }
 
-#sidebar-group-proyectos .sidebar-nav > li > a[aria-expanded="true"] {
+#sidebar-group-proyectos .sidebar-nav li a i {
+    color: black !important;
+}
+
+#sidebar-group-proyectos .sidebar-nav li a[aria-expanded="true"] {
     background-color: #151515 !important;
     color: white !important;
 }
 
-/* Rutas internas de Proyectos en gris, como las demás configuraciones. */
-#sidebar-group-proyectos .sidebar-nav > li > ul {
-    background-color: #6e7178 !important;
-}
-
-#sidebar-group-proyectos .sidebar-nav > li > ul > li > a {
+#sidebar-group-proyectos .sidebar-nav li a[aria-expanded="true"] i {
     color: white !important;
 }
 
-#sidebar-group-proyectos .sidebar-nav > li > ul > li > a:hover,
-#sidebar-group-proyectos .sidebar-nav > li > ul > li > a:focus {
+#sidebar-group-proyectos .sidebar-nav li a:hover,
+#sidebar-group-proyectos .sidebar-nav li a:focus {
     background-color: #585859 !important;
     color: white !important;
+}
+
+#sidebar-group-proyectos .sidebar-nav li a:hover i,
+#sidebar-group-proyectos .sidebar-nav li a:focus i {
+    color: white !important;
+}
+
+/* Los <ul> contenedores no deben pintar fondo propio: el color lo pone el <a> */
+#sidebar-group-proyectos .sidebar-nav ul {
+    background-color: transparent !important;
 }
 
 /* Tareas en morado */
@@ -147,10 +178,29 @@ a.sidebar-section-tareas:focus {
     text-decoration: none;
 }
 
-/* Las opciones principales de Tareas usan morado. */
-#sidebar-group-tareas .sidebar-nav > li > a {
+/* Todos los ítems de Tareas en morado claro */
+#sidebar-group-tareas .sidebar-nav li a {
     background-color: #d565d5 !important;
+    color: black !important;
+}
+
+#sidebar-group-tareas .sidebar-nav li a i {
+    color: black !important;
+}
+
+#sidebar-group-tareas .sidebar-nav li a:hover,
+#sidebar-group-tareas .sidebar-nav li a:focus {
+    background-color: #900090 !important;
     color: white !important;
+}
+
+#sidebar-group-tareas .sidebar-nav li a:hover i,
+#sidebar-group-tareas .sidebar-nav li a:focus i {
+    color: white !important;
+}
+
+#sidebar-group-tareas .sidebar-nav ul {
+    background-color: transparent !important;
 }
 
 /* Licitaciones en naranjo */
@@ -167,30 +217,38 @@ a.sidebar-section-licitaciones:focus {
     text-decoration: none;
 }
 
-/* Las opciones principales de Licitaciones usan naranjo; al desplegar una, queda oscura. */
-#sidebar-group-licitaciones .sidebar-nav > li > a {
+/* Todos los ítems de Licitaciones en naranjo claro */
+#sidebar-group-licitaciones .sidebar-nav li a {
     background-color: #f4a953 !important;
-    color: white !important;
+    color: black !important;
 }
 
-#sidebar-group-licitaciones .sidebar-nav > li > a[aria-expanded="true"] {
+#sidebar-group-licitaciones .sidebar-nav li a i {
+    color: black !important;
+}
+
+#sidebar-group-licitaciones .sidebar-nav li a[aria-expanded="true"] {
     background-color: #151515 !important;
     color: white !important;
 }
 
-/* Rutas internas de Licitaciones en gris, como las de Finanzas. */
-#sidebar-group-licitaciones .sidebar-nav > li > ul {
-    background-color: #6e7178 !important;
-}
-
-#sidebar-group-licitaciones .sidebar-nav > li > ul > li > a {
+#sidebar-group-licitaciones .sidebar-nav li a[aria-expanded="true"] i {
     color: white !important;
 }
 
-#sidebar-group-licitaciones .sidebar-nav > li > ul > li > a:hover,
-#sidebar-group-licitaciones .sidebar-nav > li > ul > li > a:focus {
+#sidebar-group-licitaciones .sidebar-nav li a:hover,
+#sidebar-group-licitaciones .sidebar-nav li a:focus {
     background-color: #585859 !important;
     color: white !important;
+}
+
+#sidebar-group-licitaciones .sidebar-nav li a:hover i,
+#sidebar-group-licitaciones .sidebar-nav li a:focus i {
+    color: white !important;
+}
+
+#sidebar-group-licitaciones .sidebar-nav ul {
+    background-color: transparent !important;
 }
 
 /* Home en gris */
@@ -207,36 +265,38 @@ a.sidebar-section-home:focus {
     text-decoration: none;
 }
 
-.sidebar-nav>li ul {
-    /* background-color: #26b809 !important; */
-    /* background-color: #4f5a5f !important; */
-    background-color: #6e7178 !important;
-}
-
-/* Variantes claras para las opciones internas de cada sección. */
-#sidebar-group-finanzas .sidebar-nav > li > a {
+/* Todos los ítems de Finanzas en verde claro */
+#sidebar-group-finanzas .sidebar-nav li a {
     background-color: #57d549 !important;
-    color: white !important;
+    color: black !important;
 }
 
-/* La opción abierta queda oscura y sus rutas permanecen en gris. */
-#sidebar-group-finanzas .sidebar-nav > li > a[aria-expanded="true"] {
+#sidebar-group-finanzas .sidebar-nav li a i {
+    color: black !important;
+}
+
+#sidebar-group-finanzas .sidebar-nav li a[aria-expanded="true"] {
     background-color: #151515 !important;
     color: white !important;
 }
 
-#sidebar-group-finanzas .sidebar-nav > li > ul {
-    background-color: #6e7178 !important;
-}
-
-#sidebar-group-finanzas .sidebar-nav > li > ul > li > a {
+#sidebar-group-finanzas .sidebar-nav li a[aria-expanded="true"] i {
     color: white !important;
 }
 
-#sidebar-group-finanzas .sidebar-nav > li > ul > li > a:hover,
-#sidebar-group-finanzas .sidebar-nav > li > ul > li > a:focus {
+#sidebar-group-finanzas .sidebar-nav li a:hover,
+#sidebar-group-finanzas .sidebar-nav li a:focus {
     background-color: #585859 !important;
     color: white !important;
+}
+
+#sidebar-group-finanzas .sidebar-nav li a:hover i,
+#sidebar-group-finanzas .sidebar-nav li a:focus i {
+    color: white !important;
+}
+
+#sidebar-group-finanzas .sidebar-nav ul {
+    background-color: transparent !important;
 }
 
 .menu-badge {
