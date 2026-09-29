@@ -1,5 +1,11 @@
-.grafico-proveedor-colores {
+/* ---- Fila superior: indicadores A/B/C + filtro ---- */
+.grafico-proveedor-top {
+    display: flex;
+    align-items: center;
     margin-bottom: 12px;
+}
+
+.grafico-proveedor-colores {
     width: 100%;
     box-sizing: border-box;
 }
@@ -53,41 +59,137 @@
     flex-shrink: 0;
 }
 
-.grafico-proveedor-layout {
-    align-items: stretch;
+/* ---- Filtro de rango (segmented control) ---- */
+.grafico-proveedor-filtro-rango {
     display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.filtro-rango-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filtro-rango-grupo {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 2px;
+    padding: 3px !important;
+    background-color: #f0f2f5 !important;
+    border: none !important;
+    border-radius: 20px !important;
+}
+
+.filtro-rango-btn {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    background: transparent !important;
+    color: #555 !important;
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: none !important;
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    padding: 5px 14px !important;
+    margin: 0 !important;
+    cursor: pointer;
+    outline: none !important;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filtro-rango-btn:hover {
+    background-color: #e2e6eb !important;
+    color: #333 !important;
+}
+
+.filtro-rango-btn.activo,
+.filtro-rango-btn.activo:hover {
+    background-color: #0070c0 !important;
+    color: #fff !important;
+    box-shadow: 0 2px 6px rgba(0, 112, 192, 0.35) !important;
+}
+
+/* ---- Tabla + grafico: misma altura ---- */
+.grafico-proveedor-layout {
+    display: flex;
+    align-items: stretch;
+    min-height: 260px;
 }
 
 .grafico-proveedor-left {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
 }
 
-.grafico-proveedor-left ::ng-deep app-resumen,
+.grafico-proveedor-left app-resumen {
+    display: block;
+    flex: 1 1 auto;
+}
+
 .grafico-proveedor-left ::ng-deep app-resumen > div,
 .grafico-proveedor-left ::ng-deep table {
     height: 100%;
 }
 
 .grafico-proveedor-right {
-    display: flex;
-    align-items: stretch;
+    position: relative;
 }
 
 .grafico-proveedor-right app-grafico {
-    width: 100%;
-    display: flex;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 15px;
+    right: 15px;
 }
 
-.grafico-proveedor-right ::ng-deep app-grafico,
-.grafico-proveedor-right ::ng-deep app-grafico > div,
-.grafico-proveedor-right ::ng-deep canvas {
-    height: 100% !important;
-    width: 100% !important;
+/* ---- Tabla ---- */
+.grafico-proveedor-left ::ng-deep table {
+    width: 100%;
+    margin-bottom: 0 !important;
+    font-size: 13px !important;
+    border-collapse: collapse;
+}
+
+.grafico-proveedor-left ::ng-deep table th,
+.grafico-proveedor-left ::ng-deep table td {
+    padding: 8px 10px !important;
+    line-height: 1.35 !important;
+    vertical-align: middle !important;
+    white-space: nowrap;
+    font-size: 13px !important;
+}
+
+.grafico-proveedor-left ::ng-deep table th {
+    font-weight: 600;
+    padding: 9px 10px !important;
+}
+
+.grafico-proveedor-left ::ng-deep table td i,
+.grafico-proveedor-left ::ng-deep table td .fa {
+    font-size: 12px !important;
+}
+
+/* ---- Indicador de fila: amarillo pastel ---- */
+.grafico-proveedor-left ::ng-deep table tbody tr:hover,
+.grafico-proveedor-left ::ng-deep table tbody tr:hover > td {
+    background-color: transparent;
+}
+
+.grafico-proveedor-left ::ng-deep table tbody tr:hover > td:not(:last-child) {
+    background-color: #fff2a8 !important;
+    transition: background-color 0.15s ease;
 }
 
 @media (max-width: 992px) {
+    .grafico-proveedor-top,
     .grafico-proveedor-layout {
         display: block;
     }
@@ -97,7 +199,18 @@
         width: 100%;
         max-width: 100%;
     }
+
+    .grafico-proveedor-filtro-rango {
+        justify-content: flex-start;
+        margin-top: 10px;
+    }
+
+    .grafico-proveedor-right {
+        height: 300px;
+        margin-top: 15px;
+    }
 }
+
 .grafico-proveedor-reportes {
     margin-top: 30px;
 }

@@ -13,6 +13,15 @@ import { sProveedor } from '../../../services/sProveedor.service';
 export class GraficoProveedorComponent implements OnInit {
 
   data: EvalProveedoresYear[];
+  dataFiltrada: EvalProveedoresYear[] = [];
+
+  rangoAnios: number = 5; // 0 = todos
+  opcionesRango: { label: string, value: number }[] = [
+    { label: '5 años', value: 5 },
+    { label: '10 años', value: 10 },
+    { label: '15 años', value: 15 },
+    { label: 'Todos', value: 0 }
+  ];
 
   agno: number;
   anios: number[];
@@ -41,7 +50,9 @@ export class GraficoProveedorComponent implements OnInit {
       { year: 2017, tipoProveedor: 'Bienes - Servicios', cantidadProveedores: 32, cantidadEvaluaciones: 0, notaPromedio: 2.71 },
       { year: 2018, tipoProveedor: 'Bienes - Servicios', cantidadProveedores: 33, cantidadEvaluaciones: 0, notaPromedio: 2.75 },
       { year: 2019, tipoProveedor: 'Bienes - Servicios', cantidadProveedores: 61, cantidadEvaluaciones: 0, notaPromedio: 2.81 }
-    ]
+    ];
+
+    this.aplicarFiltroRango();
 
     this.reportEvalProv$ = this.reportEvalProvService.getReportByYear(this.agno);
     this.reportEvalProv$.subscribe(res => this.reportEvalProv = res);
@@ -49,13 +60,35 @@ export class GraficoProveedorComponent implements OnInit {
 
   ngOnInit() {
     this.reportEvalProvService.getProveedoresYears().subscribe(res => {
-      this.data = this.data.concat(res);
-    })
+      this.data = this.data.concat(res || []);
+      this.aplicarFiltroRango();
+    });
+  }
+
+  changeRango(rango: number) {
+    this.rangoAnios = rango;
+    this.aplicarFiltroRango();
+  }
+
+  aplicarFiltroRango() {
+    if (!this.data || this.data.length === 0) {
+      this.dataFiltrada = [];
+      return;
+    }
+
+    if (!this.rangoAnios) {
+      this.dataFiltrada = [...this.data];
+      return;
+    }
+
+    const maxYear = Math.max(...this.data.map(d => Number(d.year)));
+    const minYear = maxYear - this.rangoAnios + 1;
+    this.dataFiltrada = this.data.filter(d => Number(d.year) >= minYear);
   }
 
   changeYear(year: number) {
-    this.agno = year;
-    this.reportEvalProv$ = this.reportEvalProvService.getReportByYear(year);
+    this.agno = Number(year);
+    this.reportEvalProv$ = this.reportEvalProvService.getReportByYear(this.agno);
     this.reportEvalProv$.subscribe(res => this.reportEvalProv = res);
   }
 
