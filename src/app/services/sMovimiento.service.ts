@@ -210,17 +210,14 @@ export class sMovimientoService {
             }
             pdf.text(330, top, element.cantidad.toString());
             pdf.text(420, top, "$ " + this.format(element.precioUnitario).toString());
-            if (element.tipoDeclaracion == environment.declaracion.boleta)
-                pdf.text("$ " + String(this.format(element.cantidad * element.precioUnitario - element.declaracion)), totales, top, "right");
-            else
-                pdf.text("$ " + String(this.format(element.cantidad * element.precioUnitario)), totales, top, "right");
+            pdf.text("$ " + String(this.format(element.cantidad * element.precioUnitario)), totales, top, "right");
             total += element.cantidad * element.precioUnitario;
         });
         top += 20;
         pdf.text(420, top, "Total Neto");
         let totalBoleta: number = movimiento.item.filter(el => el.tipoDeclaracion == environment.declaracion.boleta).reduce((acc, el) => acc + el.declaracion, 0)
         let totalIVA: number = movimiento.item.filter(el => el.tipoDeclaracion == environment.declaracion.afecto).reduce((acc, el) => acc + el.declaracion, 0)
-        pdf.text("$ " + String(this.format(total - totalBoleta)), totales, top, "right");
+        pdf.text("$ " + String(this.format(total)), totales, top, "right");
         if (totalBoleta > 0) {
             top += 20;
             pdf.text(420, top, "Boleta");
@@ -232,7 +229,7 @@ export class sMovimientoService {
             pdf.text("$ " + String(this.format(totalIVA)), totales, top, "right");
         } top += 20;
         pdf.text(420, top, "Total Bruto");
-        pdf.text("$ " + String(this.format(total + totalIVA)), totales, top, "right");
+        pdf.text("$ " + String(this.format(total + totalIVA + totalBoleta)), totales, top, "right");
 
         // Item --> Cuadro
         pdf.setDrawColor(128, 128, 128);
