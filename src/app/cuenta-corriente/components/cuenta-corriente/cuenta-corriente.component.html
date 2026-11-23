@@ -15,15 +15,30 @@
                     <i class="fa fa-money" (click)="bolsas=true"></i>
                     <i class="fa fa-bar-chart-o" (click)="graficar()"></i>
                     <i class="fa fa-refresh" (click)="cargaDatosOrigen()"></i>
-                    <i class="fa fa-search" (click)="TraeBuscador()"></i>
+                    <i class="fa fa-search" [class.buscador-activo]="filtro" (click)="TraeBuscador(); $event.stopPropagation()"
+                        [title]="filtro ? 'Hay una búsqueda activa' : 'Buscar'"></i>
                 </div>
             </header>
 
             <div class="widget-body">
                 <form #CForm="ngForm">
                     <fieldset>
-                        <buscador *ngIf="buscador" (event)="Filtrar($event)"></buscador>
+                        <!-- display y no *ngIf: el buscador no se destruye, así no se borra lo escrito y se puede reaplicar la búsqueda -->
+                        <buscador [style.display]="buscador ? 'block' : 'none'" [visible]="buscador" [valores]="filtro"
+                            (event)="Filtrar($event)" (cerrar)="buscador = false"></buscador>
                         <legend></legend>
+
+                        <!-- Búsqueda activa: se mantiene hasta que el usuario la limpie -->
+                        <div class="filtro-activo" *ngIf="filtro">
+                            <i class="fa fa-filter"></i>
+                            <span class="filtro-activo-titulo">Búsqueda activa:</span>
+                            <span class="filtro-chip" *ngFor="let f of resumenFiltro">
+                                {{f.etiqueta}}: <strong>{{f.valor}}</strong>
+                            </span>
+                            <button type="button" class="filtro-limpiar" (click)="limpiarBusqueda()">
+                                <i class="fa fa-times"></i> Limpiar búsqueda
+                            </button>
+                        </div>
 
                         <div class="col-lg-12 Confirmado">
                             <div class="margin05">
@@ -306,10 +321,10 @@
 
 <!-- <app-loading-pop-up></app-loading-pop-up> -->
 
-<app-pop-up-directos [id]="idIngresoEgreso" *ngIf="idIngresoEgreso" (actualizar)="cargaDatos()"
+<app-pop-up-directos [id]="idIngresoEgreso" *ngIf="idIngresoEgreso" (actualizar)="recargar()"
     (cerrar)="cerrarOrden()"></app-pop-up-directos>
-<app-popup-oc [id]="idOC" *ngIf="idOC" (actualizar)="cargaDatos()" (cerrar)="cerrarOrden()"></app-popup-oc>
-<popUp-orden-pedido [id]="idOP" *ngIf="idOP" (actualizar)="cargaDatos()" (cerrar)="cerrarOrden()"></popUp-orden-pedido>
+<app-popup-oc [id]="idOC" *ngIf="idOC" (actualizar)="recargar()" (cerrar)="cerrarOrden()"></app-popup-oc>
+<popUp-orden-pedido [id]="idOP" *ngIf="idOP" (actualizar)="recargar()" (cerrar)="cerrarOrden()"></popUp-orden-pedido>
 
 <!-- <div class="bkPopUp" *ngIf="ordenCompra">
     <div class="popUp">

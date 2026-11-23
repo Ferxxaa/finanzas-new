@@ -1,4 +1,4 @@
-<form action="Buscar()">
+<form (ngSubmit)="Buscar()">
 <div class="desplegable">
     <div class="row">
         <div class="col-12 bb1">
@@ -13,7 +13,7 @@
         <div class="col-6">
             <div id="Inicio" class="input-group date">
                 <input id="txtInicio" name="txtInicio" type="text" (focusout)="asignaFechaInicio()"
-                    class="form-control" />
+                    class="form-control" autocomplete="off" />
                 <span class="input-group-addon">
                     <span class="fa fa-calendar"></span>
                 </span>
@@ -22,7 +22,7 @@
         <div class="col-6">
             <div id="Termino" class="input-group date">
                 <input id="txtTermino" name="txtTermino" type="text" (focusout)="asignaFechaTermino()"
-                    class="form-control" />
+                    class="form-control" autocomplete="off" />
                 <span class="input-group-addon">
                     <span class="fa fa-calendar"></span>
                 </span>
@@ -35,7 +35,7 @@
     </div>
     <div class="row">
         <div class="col-6">
-            <input class="form-control" type="text" placeholder="Numero OC" name="txtOC" [(ngModel)]="buscador.oc">
+            <input class="form-control" type="text" placeholder="Numero OC" name="txtOC" [(ngModel)]="buscador.oc" autocomplete="off">
         </div>
         <div class="col-6">
             <select id="drdProveedor" class="dropdown-toggle select2-chosen-2 form-control requiered hiden"
@@ -66,8 +66,9 @@
             </select>
         </div>
         <div class="col-6">
-            <select id="drdTipoGastoB" class="dropdown-toggle select2-chosen-2 form-control requiered"
-                [(ngModel)]="buscador.subTipoGasto" name="drdTipoGastoB">
+            <!-- Antes tenía el mismo id/name que Tipo de gasto y los dos selects se pisaban -->
+            <select id="drdSubTipoGastoB" class="dropdown-toggle select2-chosen-2 form-control requiered"
+                [(ngModel)]="buscador.subTipoGasto" name="drdSubTipoGastoB">
                 <option value='' selected>--- Seleccione una opcion ---
                 </option>
                 <option *ngFor="let subTipoGasto of subTipoGasto$ | async " value={{subTipoGasto.nombreSubtipoGasto}}>
@@ -81,11 +82,11 @@
     </div>
     <div class="row">
         <div class="col-6" *ngIf="vista">
-            <input class="form-control" type="text" placeholder="N° Pago" name="txtPago" [(ngModel)]="buscador.pago">
+            <input class="form-control" type="text" placeholder="N° Pago" name="txtPago" [(ngModel)]="buscador.pago" autocomplete="off">
         </div>
         <div class="col-6" *ngIf="vista">
             <input class="form-control" type="text" placeholder="N° Factura" name="txtFactura"
-                [(ngModel)]="buscador.factura">
+                [(ngModel)]="buscador.factura" autocomplete="off">
         </div>
     </div>
     <div class="row labelHeder" >
@@ -96,13 +97,13 @@
         <div class="col-6" *ngIf="vista">
             <select id="drdEstado" class="dropdown-toggle select2-chosen-2 form-control requiered"
                 [(ngModel)]="buscador.estado" name="drdEstado">
-                <option value=0 selected>--- Seleccione una opcion ---</option>
-                <option value=1 >Pagado</option>
-                <option value=2 >Cobrado</option>
-                <option value=3 >OC / OP</option>
-                <option value=4 >Comprometido / Facturado</option>
-                <option value=5 >Proyección Egresos</option>
-                <option value=6 >Proyección Ingreso</option>
+                <option [ngValue]="0">--- Seleccione una opcion ---</option>
+                <option [ngValue]="1">Pagado</option>
+                <option [ngValue]="2">Cobrado</option>
+                <option [ngValue]="3">OC / OP</option>
+                <option [ngValue]="4">Comprometido / Facturado</option>
+                <option [ngValue]="5">Proyección Egresos</option>
+                <option [ngValue]="6">Proyección Ingreso</option>
             </select>
         </div>
         <div class="col-6" *ngIf="!tipoGasto">
@@ -117,8 +118,9 @@
     </div>
     <!-- {{buscador | json}} -->
     <div class="row mt10">
-        <div class="col-2 col-md-offset-5">
-            <button class="btn btn-primary" (click)="Buscar()">Buscar</button>
+        <div class="col-12 buscador-acciones">
+            <button type="button" class="btn btn-secondary" (click)="Limpiar()">Limpiar</button>
+            <button type="submit" class="btn btn-primary">Buscar</button>
         </div>
     </div>
     </div>

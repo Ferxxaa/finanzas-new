@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
 
 import { mOrdenCompra } from "../../../models/mOrdenCompra";
 import { mCuentas } from "../../../models/mCuentas";
@@ -24,6 +24,9 @@ import { BuscadorComponent } from "../../../shared/components/buscador/buscador.
 declare var $: any;
 declare var Swal: any;
 
+/** Llave donde se guarda la búsqueda activa (dura mientras la pestaña del navegador esté abierta). */
+const KEY_FILTRO_CUENTA_CORRIENTE = "cuentaCorriente.filtro";
+
 @Component({
   selector: "app-cuenta-corriente",
   templateUrl: "./cuenta-corriente.component.html",
@@ -41,7 +44,7 @@ declare var Swal: any;
     SCuentaCorrienteService
   ],
 })
-export class CuentaCorrienteComponent implements OnInit {
+export class CuentaCorrienteComponent implements OnInit, AfterViewInit {
   Flujos: Array<any>;
   Pendientes: Array<any>;
   Confirmados: Array<any>;
@@ -67,8 +70,10 @@ export class CuentaCorrienteComponent implements OnInit {
   indice: number;
 
   pagarSinFactura: boolean;
-  buscador: any;
-  filtro: any;
+  /** Muestra/oculta el panel del buscador. El buscador queda siempre creado (solo se oculta) para no perder lo escrito. */
+  buscador: boolean;
+  /** Búsqueda activa. Se mantiene al abrir/cerrar un movimiento, al actualizar y al volver a la pantalla, hasta que el usuario la limpie. */
+  filtro: Buscador | null;
 
   creador: string;
 
@@ -96,7 +101,8 @@ export class CuentaCorrienteComponent implements OnInit {
     private _sCajaChica: sCajaChica,
     private _sCuentaCorriente: SCuentaCorrienteService
   ) {
-    this.buscador = null;
+    this.buscador = false;
+    this.filtro = this.leerFiltroGuardado();
     this.imprimir = false;
     this.Flujos = [];
     this.Pendientes = [];
@@ -114,8 +120,11 @@ export class CuentaCorrienteComponent implements OnInit {
     this.idOC = null;
     this.idOP = null;
     // this.Ordenes$ = this._sOrdenComra.getCuentaCorriente();
-    this.cuentaCorrienteConfirmados$ = this._sCuentaCorriente.getCuentaCorrienteConfirmados();
-    this.cuentaCorrientePendientes$ = this._sCuentaCorriente.getCuentaCorrientePendientes();
+    // Si hay una búsqueda guardada se aplica en ngAfterViewInit (necesita el buscador ya creado)
+    if (!this.filtro) {
+      this.cuentaCorrienteConfirmados$ = this._sCuentaCorriente.getCuentaCorrienteConfirmados();
+      this.cuentaCorrientePendientes$ = this._sCuentaCorriente.getCuentaCorrientePendientes();
+    }
   }
 
   ngOnInit() {
@@ -128,6 +137,85 @@ export class CuentaCorrienteComponent implements OnInit {
     // this.cuentaCorrienteConfirmados$.subscribe(el => console.log(el.map(tr => tr.nombreSubTipoGasto)));
   }
 
+  ngAfterViewInit() {
+    // Al volver a la pantalla se reaplica la búsqueda guardada.
+    // setTimeout: evita el "ExpressionChangedAfterItHasBeenChecked" al cambiar los observables en este ciclo.
+    if (this.filtro) {
+      setTimeout(() => this.recargar());
+    }
+  }
+
+  // ---------------- Búsqueda persistente ----------------
+
+  /** true si la búsqueda tiene al menos un criterio. */
+  private tieneCriterios(e: Buscador | null): boolean {
+    return !!(e && (e.cCosto || Number(e.estado) > 0 || e.factura || e.inicio || e.oc || e.pago || e.proveedor || e.termino));
+  }
+
+  private leerFiltroGuardado(): Buscador | null {
+    try {
+      const texto = sessionStorage.getItem(KEY_FILTRO_CUENTA_CORRIENTE);
+      const filtro = texto ? JSON.parse(texto) : null;
+      return this.tieneCriterios(filtro) ? filtro : null;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  private guardarFiltro(filtro: Buscador | null) {
+    try {
+      if (filtro) {
+        sessionStorage.setItem(KEY_FILTRO_CUENTA_CORRIENTE, JSON.stringify(filtro));
+      } else {
+        sessionStorage.removeItem(KEY_FILTRO_CUENTA_CORRIENTE);
+      }
+    } catch (err) { }
+  }
+
+  /**
+   * Vuelve a traer los datos respetando la búsqueda activa.
+   * Se usa al actualizar, al cerrar un movimiento y al volver a la pantalla.
+   */
+  recargar() {
+    if (this.filtro && this.BuscadorComponent) {
+      this.cuentaCorrienteConfirmados$ = this.BuscadorComponent.retCuentacorrienteConfirmados(this.filtro);
+      this.cuentaCorrientePendientes$ = this.BuscadorComponent.retCuentacorrientePendientes(this.filtro);
+    } else {
+      this.cuentaCorrienteConfirmados$ = this._sCuentaCorriente.getCuentaCorrienteConfirmados();
+      this.cuentaCorrientePendientes$ = this._sCuentaCorriente.getCuentaCorrientePendientes();
+    }
+  }
+
+  /** Quita la búsqueda (solo cuando el usuario lo pide) y vuelve a mostrar todo. */
+  limpiarBusqueda() {
+    this.filtro = null;
+    this.guardarFiltro(null);
+    this.recargar();
+  }
+
+  /** Texto corto de la búsqueda activa, para mostrarlo sobre la tabla. */
+  get resumenFiltro(): Array<{ etiqueta: string; valor: string }> {
+    const f: any = this.filtro;
+    if (!f) { return []; }
+    const estados: any = { "1": "Pagado", "2": "Cobrado", "3": "OC / OP", "4": "Comprometido / Facturado", "5": "Proyección Egresos", "6": "Proyección Ingreso" };
+    const lista: Array<{ etiqueta: string; valor: string }> = [];
+    if (f.inicio || f.termino) { lista.push({ etiqueta: "Fechas", valor: this.fechaFiltroTexto(f.inicio) + " al " + this.fechaFiltroTexto(f.termino) }); }
+    if (f.oc) { lista.push({ etiqueta: "OC", valor: f.oc }); }
+    if (f.proveedor) { lista.push({ etiqueta: "Proveedor", valor: f.proveedor }); }
+    if (f.cCosto) { lista.push({ etiqueta: "Centro de costo", valor: f.cCosto }); }
+    if (f.factura) { lista.push({ etiqueta: "Factura", valor: f.factura }); }
+    if (f.pago) { lista.push({ etiqueta: "N° pago", valor: f.pago }); }
+    if (Number(f.estado) > 0) { lista.push({ etiqueta: "Estado", valor: estados[f.estado] || f.estado }); }
+    return lista;
+  }
+
+  private fechaFiltroTexto(valor: any): string {
+    if (!valor) { return "..."; }
+    const texto = String(valor);
+    const partes = texto.substring(0, 10).split("-");
+    return partes.length === 3 ? partes[2] + "/" + partes[1] + "/" + partes[0] : texto;
+  }
+
   calendario() {
     if ($ && $.fn && typeof $.fn.datetimepicker === 'function') {
       $(".date").datetimepicker({
@@ -136,15 +224,13 @@ export class CuentaCorrienteComponent implements OnInit {
     }
   }
 
+  /** Botón actualizar del encabezado: vuelve a traer los datos SIN borrar la búsqueda. */
   cargaDatosOrigen() {
-    this.filtro = null;
-    this.cuentaCorrienteConfirmados$ = this._sCuentaCorriente.getCuentaCorrienteConfirmados();
-    this.cuentaCorrientePendientes$ = this._sCuentaCorriente.getCuentaCorrientePendientes();
-    // this.cargaDatos();
+    this.recargar();
   }
 
   update() {
-    this.cargaDatosOrigen();
+    this.recargar();
     Swal.fire(
       "Movimiento",
       "Se ha actualizado correctamente el movimiento",
@@ -391,11 +477,12 @@ export class CuentaCorrienteComponent implements OnInit {
     this.bolsas = true;
   }
 
+  /** Al cerrar un movimiento se recarga manteniendo la búsqueda activa. */
   cerrarOrden() {
     this.idOC = null;
     this.idOP = null;
     this.idIngresoEgreso = null;
-    this.cargaDatosOrigen();
+    this.recargar();
   }
 
   imprSelec() {
@@ -767,7 +854,8 @@ export class CuentaCorrienteComponent implements OnInit {
   }
 
   irFinal() {
-    let element = document.getElementById("irAlFinal")
+    let element = document.getElementById("irAlFinal");
+    if (!element) { return; }
     element.scrollTop = element.scrollHeight;
   }
 
@@ -776,36 +864,25 @@ export class CuentaCorrienteComponent implements OnInit {
     this.ordenPedido = null;
   }
 
+  /** Abre/cierra el panel del buscador. Cerrarlo NO borra la búsqueda. */
   TraeBuscador() {
-    if (this.buscador == null) {
-      this.buscador = {
-        inicio: null,
-        termino: null,
-        oc: null,
-        proveedor: null,
-        cCosto: null,
-        factura: null,
-        pago: null,
-      };
-      // this.cargaDatos();
-    } else {
-      this.buscador = null;
-    }
+    this.buscador = !this.buscador;
   }
 
+  /**
+   * Búsqueda emitida por el buscador. Se guarda (sessionStorage) para que no se pierda al abrir un movimiento,
+   * actualizar o salir y volver a la pantalla. Si viene sin criterios, se toma como "limpiar".
+   */
   Filtrar(e: Buscador) {
-    // console.log(e);
-    // console.log(this.Pendientes);
-    // console.log(this.Confirmados);
-    this.buscador = null;
-    if (e.cCosto || e.estado || e.factura || e.inicio || e.oc || e.pago || e.proveedor || e.termino) {
-      this.cuentaCorrienteConfirmados$ = null;
-      this.cuentaCorrientePendientes$ = null;
-      this.cuentaCorrienteConfirmados$ = this.BuscadorComponent.retCuentacorrienteConfirmados(e);
-      this.cuentaCorrientePendientes$ = this.BuscadorComponent.retCuentacorrientePendientes(e);
+    this.buscador = false;
+    if (!this.tieneCriterios(e)) {
+      this.limpiarBusqueda();
+      return;
     }
-    // this.filtro = e;
-    // this.filtrando(this.filtro);
+    // Copia: el buscador puede seguir modificando su objeto después de emitir
+    this.filtro = JSON.parse(JSON.stringify(e));
+    this.guardarFiltro(this.filtro);
+    this.recargar();
   }
 
   filtrando(e) {

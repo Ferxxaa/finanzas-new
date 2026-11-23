@@ -30,6 +30,13 @@
     visibility: hidden;
 }
 
+/* Botones Limpiar / Buscar alineados a la derecha */
+.buscador-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
 @keyframes Desplegar {
     from {
         padding: 0em 2em;
