@@ -7,6 +7,8 @@
     --nav-purple-light: #d565d5;
     --nav-orange: #ff891b;
     --nav-orange-light: #f4a953;
+    --nav-teal: #006b6b;
+    --nav-teal-light: #4fb3b3;
     --nav-submenu: #6e7178;
 }
 
@@ -45,7 +47,8 @@ li a {
 #sidebar-proyectos-accordion .sidebar-nav > li,
 #sidebar-tareas-accordion .sidebar-nav > li,
 #sidebar-licitaciones-accordion .sidebar-nav > li,
-#sidebar-finanzas-accordion .sidebar-nav > li {
+#sidebar-finanzas-accordion .sidebar-nav > li,
+#sidebar-core-accordion .sidebar-nav > li {
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
@@ -59,7 +62,7 @@ li a {
     padding: 0 !important;
 }
 
-/* Espacio entre secciones del menú (Home, Proyectos, Tareas, Licitaciones, Finanzas) */
+/* Espacio entre secciones del menú (Home, Proyectos, Tareas, Licitaciones, Finanzas, SCORH) */
 .js-sidebar-content > ul.sidebar-nav {
     margin-top: 16px !important;
 }
@@ -131,6 +134,31 @@ a.sidebar-section-licitaciones:hover,
 a.sidebar-section-licitaciones:focus {
     background-color: var(--nav-orange) !important;
     color: white !important;
+    text-decoration: none;
+}
+
+/* SCORH en teal/petróleo */
+a.sidebar-section-core {
+    background-color: var(--nav-teal) !important;
+    color: white !important;
+    display: block;
+}
+
+a.sidebar-section-core:hover,
+a.sidebar-section-core:focus {
+    background-color: var(--nav-teal) !important;
+    color: white !important;
+    text-decoration: none;
+}
+
+#sidebar-core-accordion .sidebar-nav > li > a {
+    background-color: var(--nav-teal-light) !important;
+}
+
+#sidebar-core-accordion .sidebar-nav > li > a:hover,
+#sidebar-core-accordion .sidebar-nav > li > a:focus {
+    background-color: var(--nav-teal-light) !important;
+    color: #1a1a1a !important;
     text-decoration: none;
 }
 
@@ -229,14 +257,16 @@ a.sidebar-section-grafico:focus {
 #sidebar-proyectos-accordion a,
 #sidebar-tareas-accordion a,
 #sidebar-licitaciones-accordion a,
-#sidebar-finanzas-accordion a {
+#sidebar-finanzas-accordion a,
+#sidebar-core-accordion a {
     color: #1a1a1a !important;
 }
 
 #sidebar-proyectos-accordion .icon i,
 #sidebar-tareas-accordion .icon i,
 #sidebar-licitaciones-accordion .icon i,
-#sidebar-finanzas-accordion .icon i {
+#sidebar-finanzas-accordion .icon i,
+#sidebar-core-accordion .icon i {
     color: #1a1a1a !important;
 }
 

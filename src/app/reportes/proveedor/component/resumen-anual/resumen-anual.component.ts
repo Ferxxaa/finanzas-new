@@ -25,6 +25,8 @@ export class ResumenAnualComponent implements OnInit, OnChanges {
   reporteSubcontrato: resumenReporte;
   reporteSustituir: resumenReporte;
 
+  totalProveedores: number = 0;
+
   loading: boolean;
 
   constructor() {
@@ -59,6 +61,9 @@ export class ResumenAnualComponent implements OnInit, OnChanges {
     this.reporteServicios = this.generaResumen(servicios, totalEvaluaciones)
     this.reporteSubcontrato = this.generaResumen(subcontrato, totalEvaluaciones)
     this.reporteSustituir = this.generaResumen(sustituir, totalEvaluaciones)
+
+    this.totalProveedores = productos.length + servicios.length + subcontrato.length;
+
     this.loading = false;
   }
 
@@ -69,6 +74,10 @@ export class ResumenAnualComponent implements OnInit, OnChanges {
     resumen.cantidadProveedores = arrReporte.length
     resumen.cantidadOC = arrReporte.reduce((acc, el) => acc + el.cantidadEval, 0);
     return resumen
+  }
+
+  porcentajeProveedores(cantidad: number): number {
+    return this.totalProveedores ? (cantidad / this.totalProveedores) * 100 : 0;
   }
 
   Cerrar() {

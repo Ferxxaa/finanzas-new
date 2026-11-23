@@ -1,69 +1,101 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
-import { mCentroCosto } from '../../../models/mCentroCosto';
-import { sCentroCosto } from '../../../services/sCentroCosto.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { centroCostoService } from '../../../services/sCentroCostoNest.service';
 import { sOrdenComra } from '../../../services/sOrdenComra.service';
-import { ListadoCierreComponent } from '../../components/listado-cierre/listado-cierre.component';
+import { sCierre } from '../../../services/sCierre.service';
 
 @Component({
   selector: 'app-contenedor-cierre',
   templateUrl: './contenedor-cierre.component.html',
   styleUrls: ['./contenedor-cierre.component.css'],
   providers: [
-    sCentroCosto,
-    sOrdenComra
+    centroCostoService,
+    sOrdenComra,
+    sCierre
   ]
 })
-export class ContenedorCierreComponent implements OnInit {
+export class ContenedorCierreComponent implements OnInit, OnDestroy {
 
-  reload: boolean;
-  cierres: boolean;
-
-  centrosCosto$: Observable<mCentroCosto[]>
+  mostrarGrafico = false;
 
   totales: any[];
+  cierresHistoricos: any[] = [];
+  centrosSeleccionados: string[] = [];
 
-  @ViewChild(ListadoCierreComponent) listadoCentro: ListadoCierreComponent;
+  private totalesSub: Subscription;
+  private cierresSub: Subscription;
 
   constructor(
-    private CentroCosto: sCentroCosto,
-    private OrdenCompra: sOrdenComra
-  ) {
-    this.reload = true;
-    this.cierres = false;
-  }
+    private CentroCosto: centroCostoService,
+    private OrdenCompra: sOrdenComra,
+    private Cierre: sCierre
+  ) { }
 
   ngOnInit() {
-    this.getCentroCosto();
+    this.cargarTotales();
+    this.cargarCierres();
   }
 
-  restart() {
-    this.reload = false;
-    setTimeout(() => {
-      this.reload = true;
-    }, 500);
+  ngOnDestroy() {
+    if (this.totalesSub) {
+      this.totalesSub.unsubscribe();
+    }
+
+    if (this.cierresSub) {
+      this.cierresSub.unsubscribe();
+    }
   }
 
-  getCentroCosto() {
-    this.centrosCosto$ = this.CentroCosto.getCentroCosto();
-    this.centrosCosto$.subscribe(res => {
-      let areasFuncionales = res.filter(el => !el.nombre.includes('Operacional'));
-      let centroCosto = areasFuncionales.reduce((acc, el) => acc.concat(el.subCentroCosto), [])
-      this.getOrdenesByCentroCosto(centroCosto);
-    })
+  /** Se dispara cuando cierre-anual termina un cierre: recarga el historico para ambos paneles. */
+  onCierreRealizado() {
+    this.cargarCierres();
   }
 
-  getOrdenesByCentroCosto(centroCosto: any[]) {
-    this.OrdenCompra.getCuentaCorriente().subscribe(cuentaCorriente => {
-      let arrTemp = [];
-      centroCosto.forEach(centro => {
-        let ordenesCentro = cuentaCorriente.filter(el => el.subCentro.nombre == centro.nombre && el.ingresoEgreso == 1);
-        // console.log(centro.nombre, ordenesCentro);
-        let totalCentro = Math.ceil(ordenesCentro.reduce((acc, movimiento) => acc + this.getMontoMovimiento(movimiento), 0));
-        arrTemp.push({ nombre: centro.nombre, totalCentro, movimientos: ordenesCentro });
-      });
-      this.totales = arrTemp;
-    })
+  selectCentro(centros: string[]) {
+    this.centrosSeleccionados = centros ? centros.slice() : [];
+  }
+
+  private cargarCierres() {
+    if (this.cierresSub) {
+      this.cierresSub.unsubscribe();
+    }
+
+    this.cierresSub = this.Cierre.getCierre().subscribe(
+      (cierres: any[]) => this.cierresHistoricos = cierres || [],
+      (error: any) => console.log(error)
+    );
+  }
+
+  private cargarTotales() {
+    this.totalesSub = this.CentroCosto.getCentroCostoWithParentFull()
+      .pipe(
+        map((centros: any[]) => (centros || []).filter(centro => centro.isActive)),
+        switchMap((centros: any[]) => this.OrdenCompra.getCuentaCorriente()
+          .pipe(map((cuentaCorriente: any[]) => this.buildTotales(centros, cuentaCorriente || []))))
+      )
+      .subscribe(
+        totales => this.totales = totales,
+        (error: any) => console.log(error)
+      );
+  }
+
+  private buildTotales(centrosCosto: any[], cuentaCorriente: any[]): any[] {
+    return centrosCosto.map(centro => {
+      const movimientos = cuentaCorriente.filter(el =>
+        !!el.subCentro
+        && el.subCentro.nombre == centro.nombreCentroCosto
+        && el.ingresoEgreso == 1
+      );
+
+      return {
+        nombre: centro.nombreCentroCosto,
+        fondo: centro.fondo,
+        letras: centro.letras,
+        totalCentro: Math.ceil(movimientos.reduce((acc, movimiento) => acc + this.getMontoMovimiento(movimiento), 0)),
+        movimientos
+      };
+    });
   }
 
   private getMontoMovimiento(movimiento: any): number {
@@ -72,14 +104,6 @@ export class ContenedorCierreComponent implements OnInit {
     }
 
     return movimiento.monto || movimiento.costo || 0;
-  }
-
-  setCerrados(e) {
-    this.listadoCentro.setValueCierres(e);
-  }
-
-  selectCentro(e) {
-    this.listadoCentro.displayCentro(e)
   }
 
 }

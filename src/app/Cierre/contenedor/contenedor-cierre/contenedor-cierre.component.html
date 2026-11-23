@@ -11,7 +11,7 @@
             <p>Administra el cierre por centros de costo, fecha de corte y seguimiento historico.</p>
         </div>
         <div class="hero-actions">
-            <button type="button" class="graph-trigger" (click)="cierres=true" title="Cierres de Centros de costo">
+            <button type="button" class="graph-trigger" (click)="mostrarGrafico = true" title="Cierres de Centros de costo">
                 <span class="fa fa-line-chart"></span>
                 <span>Resumen grafico</span>
             </button>
@@ -21,13 +21,24 @@
     <div class="widget-body cierre-body">
         <div class="cierre-grid">
             <div class="panel panel-primary">
-                <app-cierre-anual (selectCentro)="selectCentro($event)" (reload)="restart()" (listado)="setCerrados($event)" *ngIf="totales" [totales]="totales"></app-cierre-anual>
+                <app-cierre-anual
+                    *ngIf="totales"
+                    [totales]="totales"
+                    [cierres]="cierresHistoricos"
+                    (selectCentro)="selectCentro($event)"
+                    (reload)="onCierreRealizado()">
+                </app-cierre-anual>
             </div>
-            <div class="panel panel-secondary" *ngIf="reload">
-                <app-listado-cierre *ngIf="totales" [totales]="totales"></app-listado-cierre>
+            <div class="panel panel-secondary">
+                <app-listado-cierre
+                    *ngIf="totales"
+                    [totales]="totales"
+                    [cierres]="cierresHistoricos"
+                    [centrosSeleccionados]="centrosSeleccionados">
+                </app-listado-cierre>
             </div>
         </div>
     </div>
 </section>
 
-<app-graph-cierres *ngIf="cierres" (cerrar)="cierres=false"></app-graph-cierres>
+<app-graph-cierres *ngIf="mostrarGrafico" (cerrar)="mostrarGrafico = false"></app-graph-cierres>

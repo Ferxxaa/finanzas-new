@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { Http, Response } from "@angular/http";
 import { Observable } from "rxjs";
-import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/observable/concat';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
@@ -41,19 +42,30 @@ export class reporteOperacionalService {
             const cacheKey = 'reporte-operacional-' + year;
             const cached = localStorage.getItem(cacheKey);
             const cachedData = cached ? JSON.parse(cached) : null;
+            const hasCachedData = cachedData && Array.isArray(cachedData.data);
 
-            if (cachedData && cachedData.timestamp && Date.now() - cachedData.timestamp < 300000) {
+            if (hasCachedData && cachedData.timestamp && Date.now() - cachedData.timestamp < 300000) {
                 this.reportByYearCache.set(year, Observable.of(cachedData.data));
             } else {
-                this.reportByYearCache.set(year,
-                    this._http.get(`${this.context}/year/${year}`)
-                        .map((res: Response) => {
-                            const data = res.json() || [];
-                            localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: data }));
-                            return data;
+                const request = this._http.get(`${this.context}/year/${year}`)
+                    .map((res: Response) => {
+                        const data = res.json() || [];
+                        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: data }));
+                        return data;
+                    })
+                    .shareReplay(1);
+
+                const report = hasCachedData
+                    ? Observable.concat(
+                        Observable.of(cachedData.data),
+                        request.catch(error => {
+                            console.error(`No se pudo actualizar el reporte operacional de ${year}.`, error);
+                            return Observable.of(cachedData.data);
                         })
-                        .shareReplay(1)
-                );
+                    )
+                    : request;
+
+                this.reportByYearCache.set(year, report.shareReplay(1));
             }
         }
         return this.reportByYearCache.get(year);
@@ -66,10 +78,13 @@ export class reporteOperacionalService {
                     .switchMap(selectedYears => {
 
                         const requests = selectedYears.map(itemYear =>
-                            this.getReportByYear(itemYear).catch(_ => Observable.of([]))
+                            this.getReportByYear(itemYear).catch(error => {
+                                console.error(`No se pudo cargar el reporte operacional de ${itemYear}.`, error);
+                                return Observable.of([]);
+                            })
                         );
 
-                        return Observable.forkJoin(requests)
+                        return Observable.combineLatest(requests)
                             .map((reports: tablaReporteOperacional[][]) => selectedYears
                                 .map((itemYear, index) => this.buildYearSeries(itemYear, reports[index]))
                                 .filter(item => !!item)

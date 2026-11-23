@@ -70,47 +70,143 @@ export class ContenedorConsolidaRentabilidadComponent implements OnInit {
   }
 
   genConsolidado(ordenes: any[], centroCosto: any[], gastos: any[], operacional: any[], ingresos: any[]) {
-    this.consolidado = [];
     this.consolidado = [
       { agno: 2016, utilidadArq: 61614154, rentabilidadArq: 39.44, utilidadConstruccion: 185997894, rentabilidadConstruccion: 15.97, ventasArea: 1320881193, rentabilidadRetiros: 67600000, porcentajeRetiros: 0, final: 61614154 + 185997894, finalPorcentaje: (61614154 + 185997894) * 100 / 1320881193 },
       { agno: 2017, utilidadArq: -32127465, rentabilidadArq: -61.35, utilidadConstruccion: 267861092, rentabilidadConstruccion: 29.5, ventasArea: 958877696, rentabilidadRetiros: 101072414, porcentajeRetiros: 0, final: 267861092 - 32127465, finalPorcentaje: (267861092 - 32127465) * 100 / 958877696 },
     ];
-    ordenes.forEach(cierre => {
-      // console.log(gastos);
-
-      // console.log("***********************" + cierre.agno + "***********************");
-      let gastoOperacionalArq = this.gastoOperacionalSubTipos(gastos.filter(el => el.areaNegocio && el.areaNegocio._id == '5ea8afc6cfb9095e5829a2d4'), operacional, cierre.agno)
-      let gastoOperacionalCons = this.gastoOperacionalSubTipos(gastos.filter(el => el.areaNegocio && el.areaNegocio._id == '5ea8afbccfb9095e5829a2d3'), operacional, cierre.agno)
-      // let ingresoNetoArq = this.Ordenes.retMontoNeto(cierre.OC.concat(cierre.OP).filter(el => el.ingresoEgreso == 2 && this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afc6cfb9095e5829a2d4')))
-      let ingresoNetoArq = this.Ordenes.retMontoNeto(ingresos.map(el => ({ ...el, estadosPagos: el.estadosPagos.filter(el => new Date(el.fecha).getFullYear() == cierre.agno) })).filter(el => el.estadosPagos.length && this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afc6cfb9095e5829a2d4')))
-      let egresoNetoArq = this.Ordenes.retMontoNeto(cierre.OC.concat(cierre.OP).filter(el => el.ingresoEgreso == 1 && this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afc6cfb9095e5829a2d4')))
-      // let ingresoNetoCons = this.Ordenes.retMontoNeto(cierre.OC.concat(cierre.OP).filter(el => el.ingresoEgreso == 2 && this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afbccfb9095e5829a2d3')))
-      let ingresoNetoCons = this.Ordenes.retMontoNeto(ingresos.map(el => ({ ...el, estadosPagos: el.estadosPagos.filter(el => new Date(el.fecha).getFullYear() == cierre.agno) })).filter(el => el.estadosPagos.length && this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afbccfb9095e5829a2d3')))
-      let egresoNetoCons = this.Ordenes.retMontoNeto(cierre.OC.concat(cierre.OP).filter(el => el.ingresoEgreso == 1 && this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afbccfb9095e5829a2d3')))
-
-      // let ingresosPorAgnoArq = 
-      // let ingresosPorAgnoCons = 
-      // console.log("Ingresos Arq:", ingresosPorAgnoArq, this.Ordenes.retMontoNeto(ingresosPorAgnoArq) - egresoNetoArq - gastoOperacionalArq);
-      // console.log("Ingresos Cons:", ingresosPorAgnoCons, this.Ordenes.retMontoNeto(ingresosPorAgnoCons) - egresoNetoCons - gastoOperacionalCons);
-
-      // let gastoOperacionalArea = gastoOperacionalArq + gastoOperacionalCons
-      let ingresoNeto = ingresoNetoArq + ingresoNetoCons
-      let utilidadArq = ingresoNetoArq - egresoNetoArq - gastoOperacionalArq
-      let utilidadCons = ingresoNetoCons - egresoNetoCons - gastoOperacionalCons
-      let utilidad = utilidadArq + utilidadCons
-      let consolidado = {
-        agno: cierre.agno,
-        utilidadArq: utilidadArq,
-        rentabilidadArq: ingresoNetoArq ? utilidadArq * 100 / ingresoNetoArq : 0,
-        utilidadConstruccion: utilidadCons,
-        rentabilidadConstruccion: ingresoNetoCons ? utilidadCons * 100 / ingresoNetoCons : 0,
-        ventasArea: ingresoNetoArq + ingresoNetoCons,
-        final: utilidad,
-        finalPorcentaje: utilidad * 100 / (ingresoNetoArq + ingresoNetoCons)
-      };
-      this.consolidado.push(consolidado);
-    });
+    this.getConsolidadoYears(ordenes)
+      .filter(agno => agno > 2017)
+      .forEach(agno => {
+        const gastosArq = (gastos || []).filter(el => el.areaNegocio && el.areaNegocio._id == '5ea8afc6cfb9095e5829a2d4');
+        const gastosCons = (gastos || []).filter(el => el.areaNegocio && el.areaNegocio._id == '5ea8afbccfb9095e5829a2d3');
+        const cierresDelAgno = this.getCierreOrdersForYear(ordenes, agno);
+        const gastoOperacionalArq = this.gastoOperacionalSubTipos(gastosArq, operacional, agno);
+        const gastoOperacionalCons = this.gastoOperacionalSubTipos(gastosCons, operacional, agno);
+        const ingresosDelAgno = (ingresos || []).map(el => ({
+          ...el,
+          estadosPagos: (el.estadosPagos || []).filter(pago => this.getDateYear(pago.fecha) == agno)
+        })).filter(el => el.estadosPagos.length);
+        const ingresoNetoArq = this.Ordenes.retMontoNeto(ingresosDelAgno.filter(el =>
+          this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afc6cfb9095e5829a2d4')
+        ));
+        const egresoNetoArq = this.Ordenes.retMontoNeto(cierresDelAgno.filter(el =>
+          el.ingresoEgreso == 1 && this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afc6cfb9095e5829a2d4')
+        ));
+        const ingresoNetoCons = this.Ordenes.retMontoNeto(ingresosDelAgno.filter(el =>
+          this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afbccfb9095e5829a2d3')
+        ));
+        const egresoNetoCons = this.Ordenes.retMontoNeto(cierresDelAgno.filter(el =>
+          el.ingresoEgreso == 1 && this.retAreaNegocio(centroCosto, el.subCentroCosto, '5ea8afbccfb9095e5829a2d3')
+        ));
+        const ingresoNeto = ingresoNetoArq + ingresoNetoCons;
+        const utilidadArq = ingresoNetoArq - egresoNetoArq - gastoOperacionalArq;
+        const utilidadCons = ingresoNetoCons - egresoNetoCons - gastoOperacionalCons;
+        const utilidad = utilidadArq + utilidadCons;
+        this.consolidado.push({
+          agno: agno,
+          utilidadArq: utilidadArq,
+          rentabilidadArq: ingresoNetoArq ? utilidadArq * 100 / ingresoNetoArq : 0,
+          utilidadConstruccion: utilidadCons,
+          rentabilidadConstruccion: ingresoNetoCons ? utilidadCons * 100 / ingresoNetoCons : 0,
+          ventasArea: ingresoNeto,
+          final: utilidad,
+          finalPorcentaje: ingresoNeto ? utilidad * 100 / ingresoNeto : 0
+        });
+      });
     this.consolidado = this.replaceAgnosSindatos(this.consolidado.map(el => ({ ...el, ...this.getOperacional(el.agno, operacional) })))
+  }
+
+  private getConsolidadoYears(cierres: any[]): number[] {
+    const years = {};
+    const addYear = (year: number) => {
+      if (year && year >= 2016) {
+        years[year] = true;
+      }
+    };
+    const addRange = (start: any, end: any) => {
+      const firstYear = this.getDateYear(start);
+      const lastYear = this.getDateYear(end);
+      if (!firstYear || !lastYear || lastYear < firstYear) {
+        return;
+      }
+      for (let year = firstYear; year <= lastYear; year++) {
+        addYear(year);
+      }
+    };
+
+    (cierres || []).forEach(cierre => {
+      addYear(Number(cierre.agno));
+      (cierre.detalleCierre || []).forEach(detalle => {
+        if (detalle.tipoCierre === 'etapas' && detalle.etapas && detalle.etapas.length) {
+          addRange(detalle.etapas[0].fechaInicio, detalle.etapas[detalle.etapas.length - 1].fechaFin);
+        } else {
+          addRange(detalle.fechaInicio || cierre.agno + '-01-01', detalle.fechaCorte || detalle.fechaFin);
+        }
+      });
+
+      (cierre.OC || []).concat(cierre.OP || []).forEach(orden => {
+        (orden.estadosPagos || []).forEach(pago => addYear(this.getDateYear(pago.fecha)));
+      });
+    });
+
+    return Object.keys(years).map(year => Number(year)).sort((a, b) => a - b);
+  }
+
+  private getCierreOrdersForYear(cierres: any[], agno: number): any[] {
+    const ordersById = {};
+    const paymentKeys = {};
+
+    (cierres || []).forEach(cierre => {
+      [
+        { tipo: 'OC', ordenes: cierre.OC || [] },
+        { tipo: 'OP', ordenes: cierre.OP || [] }
+      ].forEach(grupo => grupo.ordenes.forEach(orden => {
+        const orderId = grupo.tipo + ':' + (orden._id || [orden.folio, orden.subCentroCosto, orden.descripcion].join('|'));
+        const pagos = (orden.estadosPagos || []).filter(pago => this.getDateYear(pago.fecha) == agno);
+        pagos.forEach(pago => {
+          const paymentKey = [
+            orderId,
+            pago._id || '',
+            pago.fecha || '',
+            pago.monto || 0,
+            pago.numeroPago || '',
+            pago.factura || '',
+            pago.estado || ''
+          ].join('|');
+          if (paymentKeys[paymentKey]) {
+            return;
+          }
+          paymentKeys[paymentKey] = true;
+
+          if (!ordersById[orderId]) {
+            ordersById[orderId] = { ...orden, estadosPagos: [] };
+          }
+          ordersById[orderId].estadosPagos.push(pago);
+        });
+      }));
+    });
+
+    return Object.keys(ordersById).map(id => ordersById[id]);
+  }
+
+  private getDateYear(value: any): number | null {
+    if (!value) {
+      return null;
+    }
+
+    const date = String(value).split('T')[0];
+    const isoDate = date.match(/^(\d{4})-\d{2}-\d{2}$/);
+    if (isoDate) {
+      return Number(isoDate[1]);
+    }
+
+    const localDate = date.match(/^\d{1,2}\/\d{1,2}\/(\d{4})$/);
+    if (localDate) {
+      return Number(localDate[1]);
+    }
+
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? null : parsed.getFullYear();
   }
 
   retOperacionalAreaNegocio(areaNegocio) {
@@ -122,6 +218,10 @@ export class ContenedorConsolidaRentabilidadComponent implements OnInit {
   }
 
   gastoOperacionalSubTipos(gastos: any[], operacional: any[], agno: number): number {
+    if (!gastos || !gastos.length) {
+      return 0;
+    }
+
     let subTipos = gastos.reduce((acc, el) => acc.concat(el.subTipoGasto), []);
     let operacionalArea = operacional.filter(el => el.ingresoEgreso == 1 && subTipos.includes(el.subTipoGasto) && el.tipoGasto.nombre.trim() == this.retOperacionalAreaNegocio(gastos[0].areaNegocio._id))
     return this.Ordenes.retMontoNeto(this.getOperacionalAgnos(operacionalArea, agno))

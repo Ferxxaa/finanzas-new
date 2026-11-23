@@ -1,125 +1,185 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Observable } from 'rxjs';
-import { mCentroCosto } from '../../../models/mCentroCosto';
-import { sCentroCosto } from '../../../services/sCentroCosto.service';
+import { forkJoin } from 'rxjs/observable/forkJoin';
+import { of } from 'rxjs/observable/of';
+import { mergeMap, take } from 'rxjs/operators';
 import { sOrdenComra } from '../../../services/sOrdenComra.service';
-import { forkJoin } from 'rxjs/observable/forkJoin'
-import { mOrdenCompra } from '../../../models/mOrdenCompra';
 import { sOrdenPedido } from '../../../services/sOrdenPedido.service';
 import { sCierre } from '../../../services/sCierre.service';
 
 declare var $: any;
 declare var Swal: any;
 
+interface CentroCostoItem {
+  nombre: string;
+  fondo: string;
+  letras: string;
+}
+
+interface ResumenCentro {
+  porcentaje: number;
+  texto: string;
+}
+
+interface EstilosCentro {
+  card: any;
+  icon: any;
+  text: any;
+  meta: any;
+  track: any;
+  progress: any;
+}
+
 @Component({
   selector: 'app-cierre-anual',
   templateUrl: './cierre-anual.component.html',
   styleUrls: ['./cierre-anual.component.css'],
   providers: [
-    sCentroCosto,
     sOrdenComra,
     sOrdenPedido,
     sCierre
   ]
 })
-export class CierreAnualComponent implements OnInit {
-
-  private readonly centrosExcluidos = ['canil', 'coanil'];
-  private readonly centrosExcluidosPorCoincidencia = ['otro', 'vario', 'operacional'];
+export class CierreAnualComponent implements OnInit, OnChanges {
 
   @Input() totales: any[];
+  @Input() cierres: any[];
 
-  @Output() reload = new EventEmitter();
-  @Output() selectCentro = new EventEmitter();
-  @Output() listado = new EventEmitter();
+  @Output() reload = new EventEmitter<any>();
+  @Output() selectCentro = new EventEmitter<string[]>();
 
   agno: number;
   agnosDisponibles: number[];
-  tiposCierre: any[];
-  cantidadEtapasOpciones: number[];
+  tiposCierre = [
+    { value: 'directo', label: 'Directo', description: 'Cierra el centro completo en una sola accion.' },
+    { value: 'etapas', label: 'Por etapas', description: 'Organiza el cierre en varias etapas antes de concluirlo.' }
+  ];
+  cantidadEtapasOpciones = [2, 3, 4, 5, 6];
 
-  centroCosto$: Observable<mCentroCosto[]>
-  centrosCostoItems: mCentroCosto[];
-  cerrar: string[];
-  fechaCorte: string;
-  tipoCierre: string;
-  cantidadEtapas: number;
-  etapasCierre: any[];
-  arrConcluir: mOrdenCompra[];
-  cerrados: any[];
-  cierresHistoricos: any[];
-  agnoUltimoCierrePorCentro: { [key: string]: number };
+  centrosCostoItems: CentroCostoItem[] = [];
+  cerrar: string[] = [];
+  fechaCorte: string = null;
+  tipoCierre: string = null;
+  cantidadEtapas: number = null;
+  etapasCierre: any[] = [];
+  cierresHistoricos: any[] = [];
+  agnoUltimoCierrePorCentro: { [key: string]: number } = {};
 
-  loading: boolean;
+  loading = false;
 
-  listado$: Observable<any>;
+  /** Porcentaje y texto por centro, precalculados cuando cambian cierres o totales. */
+  private resumenPorCentro: { [key: string]: ResumenCentro } = {};
+  /** Estilos por centro + estado activo, para no recalcular colores en cada ciclo. */
+  private estilosCache: { [key: string]: EstilosCentro } = {};
 
   constructor(
-    private _sCentroCosto: sCentroCosto,
     private OrdenCompra: sOrdenComra,
     private OrdenPedido: sOrdenPedido,
     private Cierre: sCierre
   ) {
-    this.limpiar()
     this.agnosDisponibles = this.buildAgnosDisponibles();
-    this.tiposCierre = [
-      { value: 'directo', label: 'Directo', description: 'Cierra el centro completo en una sola accion.' },
-      { value: 'etapas', label: 'Por etapas', description: 'Organiza el cierre en varias etapas antes de concluirlo.' }
-    ];
-    this.cantidadEtapasOpciones = [2, 3, 4, 5, 6];
+    this.resetFormulario();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.cierres) {
+      this.cierresHistoricos = this.cierres || [];
+    }
+
+    if (changes.totales) {
+      this.centrosCostoItems = this.buildCentrosCostoItems();
+      this.estilosCache = {};
+    }
+
+    if (changes.cierres || changes.totales) {
+      this.rebuildResumenCentros();
+    }
   }
 
   ngOnInit() {
     this.setAgnoDefault();
-    this.getCierres();
-    this.loadCentrosCosto();
   }
 
-  getCierres() {
-    this.listado$.subscribe(allCerrados => {
-      this.cierresHistoricos = allCerrados || [];
-      this.rebuildAgnoUltimoCierrePorCentro();
-      this.listado.emit(allCerrados);
-      let allOrdenes = allCerrados.map(el => ({ agno: el.agno, allOC: el.OC.concat(el.OP).filter(el => el.ingresoEgreso == 1) }))
-      this.cerrados = allOrdenes.reduce((acc, el) => acc.concat(el.allOC), [])
-      // console.log(this.cerrados);
-    })
+  // ---------------------------------------------------------------------------
+  // Centros de costo (template)
+  // ---------------------------------------------------------------------------
+
+  filtraCierresCentroCosto(centroCosto: string): number {
+    const resumen = this.resumenPorCentro[centroCosto];
+    return resumen ? resumen.porcentaje : 0;
   }
 
-  filtraCierresCentroCosto(centroCosto): number {
-    if (!this.cierresHistoricos || !this.totales) {
-      return 0;
+  getTextoPorcentajeCentro(centroCosto: string): string {
+    const resumen = this.resumenPorCentro[centroCosto];
+    return resumen ? resumen.texto : 'Sin cierre registrado';
+  }
+
+  activate(centroCosto: CentroCostoItem) {
+    this.cerrar = this.cerrar.includes(centroCosto.nombre) ? [] : [centroCosto.nombre];
+    this.selectCentro.emit(this.cerrar);
+  }
+
+  isActive(centroCosto: CentroCostoItem): boolean {
+    return this.cerrar.includes(centroCosto.nombre);
+  }
+
+  limpiarSeleccion() {
+    this.cerrar = [];
+    this.selectCentro.emit(this.cerrar);
+  }
+
+  getCentroCardStyle(centro: CentroCostoItem): any {
+    return this.getEstilosCentro(centro).card;
+  }
+
+  getCentroIconStyle(centro: CentroCostoItem): any {
+    return this.getEstilosCentro(centro).icon;
+  }
+
+  getCentroTextStyle(centro: CentroCostoItem): any {
+    return this.getEstilosCentro(centro).text;
+  }
+
+  getCentroMetaStyle(centro: CentroCostoItem): any {
+    return this.getEstilosCentro(centro).meta;
+  }
+
+  getCentroProgressTrackStyle(centro: CentroCostoItem): any {
+    return this.getEstilosCentro(centro).track;
+  }
+
+  getCentroProgressStyle(centro: CentroCostoItem): any {
+    return this.getEstilosCentro(centro).progress;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Formulario
+  // ---------------------------------------------------------------------------
+
+  limpiar() {
+    this.resetFormulario();
+    this.selectCentro.emit(this.cerrar);
+  }
+
+  setTipoCierre(tipo: string) {
+    this.tipoCierre = tipo;
+    this.fechaCorte = null;
+    this.limpiarInputFechaCorte();
+
+    if (tipo !== 'etapas') {
+      this.cantidadEtapas = null;
+      this.etapasCierre = [];
+      return;
     }
 
-    const totalInfo = this.totales.find(el => el.nombre == centroCosto);
-    const totalCentro = totalInfo ? totalInfo.totalCentro : 0;
-    if (!totalCentro) {
-      return 0;
+    if (this.cantidadEtapas) {
+      this.buildEtapas();
     }
-
-    const totalCerradoCentro = this.getTotalCerradoCentro(centroCosto);
-    return Math.min(100, totalCerradoCentro * 100 / totalCentro);
   }
 
-  activate(centroCosto: mCentroCosto) {
-    if (this.cerrar.includes(centroCosto.nombre))
-      this.cerrar = []
-    else
-      this.cerrar = [centroCosto.nombre]
-    this.selectCentro.emit(this.cerrar)
-  }
-
-  isActive(centroCosto: mCentroCosto): boolean {
-    // console.log(this.cerrar);
-    if (this.cerrar.includes(centroCosto.nombre))
-      return true;
-    else
-      return false;
-  }
-
-  AsignaFechaCorte() {
-    const valorFecha = $('#txtfechaCorte').val();
-    this.onFechaCorteChange(valorFecha);
+  setCantidadEtapas(cantidad: number) {
+    this.cantidadEtapas = cantidad;
+    this.buildEtapas();
   }
 
   onFechaCorteChange(valorFecha: any) {
@@ -127,39 +187,38 @@ export class CierreAnualComponent implements OnInit {
     this.syncEtapasDesdeFechaCorte();
   }
 
-  abrirCalendarioFechaCorte() {
-    if (!$) {
+  onFechaInicioEtapaChange(index: number, value: string) {
+    if (index !== 0 || !this.etapasCierre[index]) {
       return;
     }
 
-    const inputFecha = $('#txtfechaCorte');
-    if (!inputFecha || !inputFecha.length) {
-      return;
-    }
-
-    const nativeInput = inputFecha.get(0);
-    nativeInput.focus();
-
-    if (nativeInput && typeof nativeInput.showPicker === 'function') {
-      nativeInput.showPicker();
-      return;
-    }
-
-    if (nativeInput && typeof nativeInput.click === 'function') {
-      nativeInput.click();
-    }
-
-    inputFecha.trigger('click');
+    this.fechaCorte = value ? this.ReturnFecha(value) : null;
+    this.etapasCierre[index].fechaInicio = value || null;
+    this.syncEtapasDesdeFechaCorte();
   }
 
-  ReturnFecha(valorFecha: any) {
+  onFechaFinEtapaChange(index: number, value: string) {
+    if (!this.etapasCierre[index]) {
+      return;
+    }
+
+    this.etapasCierre[index].fechaFin = value || null;
+
+    for (let etapaIndex = index + 1; etapaIndex < this.etapasCierre.length; etapaIndex++) {
+      const etapaAnterior = this.etapasCierre[etapaIndex - 1];
+      this.etapasCierre[etapaIndex].fechaInicio = etapaAnterior && etapaAnterior.fechaFin
+        ? this.getNextDateInputValue(etapaAnterior.fechaFin)
+        : null;
+      this.limpiarFinSiEsInvalido(this.etapasCierre[etapaIndex]);
+    }
+  }
+
+  ReturnFecha(valorFecha: any): string | null {
     const valor = (valorFecha || '').toString();
 
     if (valor.includes('/')) {
-      let dia = valor.split("/")[0];
-      let mes = valor.split("/")[1];
-      let agno = valor.split("/")[2];
-      return agno + "-" + mes + "-" + dia + "T00:00:00";
+      const [dia, mes, agno] = valor.split('/');
+      return agno + '-' + mes + '-' + dia + 'T00:00:00';
     }
 
     if (valor.includes('-')) {
@@ -169,202 +228,19 @@ export class CierreAnualComponent implements OnInit {
     return null;
   }
 
-  limpiar() {
-    this.listado$ = this.Cierre.getCierre();
-    this.centroCosto$ = this._sCentroCosto.getCentroCosto();
-    this.setAgnoDefault();
-    this.cerrar = [];
-    this.tipoCierre = null;
-    this.cantidadEtapas = null;
-    this.etapasCierre = [];
-    this.arrConcluir = [];
-    this.agnoUltimoCierrePorCentro = {};
-    this.loading = false;
-    this.fechaCorte = null;
-    if ($) {
-      $('#txtfechaCorte').val('');
-    }
-    this.selectCentro.emit(this.cerrar);
-  }
-
-  concluir() {
-    if (!this.puedeConcluir()) {
-      return;
-    }
-
-    const fechaCorteOperativa = this.getFechaCorteOperativa();
-    let arrObservable: Observable<any>[] = [];
-    let arrObservablePedido: Observable<any>[] = [];
-    // this.arrConcluir = [];
-    this.loading = true;
-    let cierre: any = { _id: null, agno: this.agno, OC: null, OP: null, detalleCierre: [] };
-    if (!fechaCorteOperativa) {
-      this.loading = false;
-      return;
-    }
-    // console.log(this.fechaCorte);
-
-    this.cerrar.forEach(centroCosto => {
-      arrObservable.push(this.OrdenCompra.getOrdenComprabyCentroCosto(centroCosto));
-      arrObservablePedido.push(this.OrdenPedido.getOrdenPedidobyCentroCosto(centroCosto));
-    });
-    forkJoin(...arrObservable).subscribe(res => {
-      // let mapa = res.map(el => el.filter(fil => new Date(this.retEstadoPagoMayor(fil.estadosPagos)) <= new Date(this.fechaCorte)))
-      let mapa = res
-        .map(el => el
-          .filter(fil => fil.estadosPagos
-            .filter(element => new Date(element.fecha) <= new Date(fechaCorteOperativa)).length)
-          .map(mapa => ({ ...mapa, estadosPagos: this.retEP(mapa.estadosPagos) })));
-      let redu = mapa.reduce((acc, el) => acc.concat(el), []);
-      // this.arrConcluir.push(redu);
-      cierre.OC = redu;
-      forkJoin(...arrObservablePedido).subscribe(Pedido => {
-        // let mapa2 = Pedido.map(el => el.filter(fil => new Date(this.retEstadoPagoMayor(fil.estadosPagos)) <= new Date(this.fechaCorte)))
-        let mapa2 = Pedido
-          .map(el => el
-            .filter(fil => fil.estadosPagos
-              .filter(element => new Date(element.fecha) <= new Date(fechaCorteOperativa)).length)
-            .map(mapa => ({ ...mapa, estadosPagos: this.retEP(mapa.estadosPagos) })));
-        let redu2 = mapa2.reduce((acc, el) => acc.concat(el), []);
-        // this.arrConcluir.push(redu2);
-        cierre.OP = redu2;
-        cierre.detalleCierre = [this.buildDetalleCierre()];
-        const actualizacionesOrdenes = this.cerrarEP(res[0], cierre.OC, 1).concat(this.cerrarEP(Pedido[0], cierre.OP, 2));
-
-        if (!actualizacionesOrdenes.length) {
-          this.persistirCierre(cierre);
-          return;
-        }
-
-        forkJoin(...actualizacionesOrdenes).subscribe(() => {
-          this.persistirCierre(cierre);
-        }, (error: any) => this.handleConcluirError(error));
-      }, (error: any) => this.handleConcluirError(error));
-    }, (error: any) => this.handleConcluirError(error));
-  }
-
-  // retPoseeFechaEnRango(el, i, arr): boolean {
-  //   return el.estadosPagos.filter(element => new Date(element.fecha) <= new Date(this.fechaCorte)).length;
-  //   // fil => 
-  //   //                     fil.estadosPagos.filter(element => 
-  //   //                       new Date(element.fecha) <= new Date(this.fechaCorte)).length
-  // }
-
-  cerrarEP(OC: any[], cierre: any[], tipo: number): Observable<any>[] {
-    const fechaCorteOperativa = this.getFechaCorteOperativa();
-    let ordenes = OC.filter(ordenes => {
-      if (cierre.map(el => el._id).includes(ordenes._id)) {
-        ordenes.estadosPagos = ordenes.estadosPagos.map(el => {
-          if (el.fecha && fechaCorteOperativa && new Date(el.fecha) <= new Date(fechaCorteOperativa))
-            return { ...el, cerrado: true }
-          else
-            return { ...el }
-        })
-        return true
-      }
-      return false
-    });
-    return ordenes.map(orden => tipo == 1
-      ? this.OrdenCompra.putOrdenCompra(orden)
-      : this.OrdenPedido.putOrdenPedido(orden));
-  }
-
-  persistirCierre(cierre: any) {
-    this.Cierre.getCierreByAgno(this.agno).subscribe(cierreHistorico => {
-      if (cierreHistorico.length) {
-        cierreHistorico[0].OC.length ? cierreHistorico[0].OC = cierreHistorico[0].OC.concat(cierre.OC).filter(this.onlyUnique) : cierreHistorico[0].OC = cierre.OC;
-        cierreHistorico[0].OP.length ? cierreHistorico[0].OP = cierreHistorico[0].OP.concat(cierre.OP).filter(this.onlyUnique) : cierreHistorico[0].OP = cierre.OP;
-        cierreHistorico[0].detalleCierre = this.mergeDetalleCierre(cierreHistorico[0].detalleCierre, cierre.detalleCierre);
-
-        this.Cierre.putBolsa(cierreHistorico[0]).subscribe(() => {
-          this.loading = false;
-          this.showConcluirSuccess();
-          this.reload.emit(null);
-        }, (error: any) => this.handleConcluirError(error));
-      } else {
-        this.Cierre.postBolsa(cierre).subscribe(() => {
-          this.loading = false;
-          this.showConcluirSuccess();
-          this.reload.emit(null);
-        }, (error: any) => this.handleConcluirError(error));
-      }
-    }, (error: any) => this.handleConcluirError(error));
-  }
-
-  handleConcluirError(error: any) {
-    console.log(error);
-    this.loading = false;
-    if (typeof Swal !== 'undefined') {
-      Swal.fire(
-        'Cierre',
-        'No fue posible completar el cierre. Intenta nuevamente.',
-        'error'
-      );
-    }
-  }
-
-  retEP(estadoPagos: any[]): any[] {
-    const fechaCorteOperativa = this.getFechaCorteOperativa();
-    return estadoPagos.filter(el => el.fecha && fechaCorteOperativa && new Date(el.fecha) <= new Date(fechaCorteOperativa) && !el.cerrado);
-  }
-
-  retTotalEstadosPago(estadoPagos: any[]): number {
-    return (estadoPagos || []).reduce((acc, el) => acc + (el.monto || 0), 0);
-  }
-
-  getCentroDetalleHistorico(centroCosto: string): any {
-    const cierreMasReciente = this.getUltimoCierrePorCentro(centroCosto);
-    if (!cierreMasReciente || !cierreMasReciente.detalleCierre) {
-      return null;
-    }
-
-    return cierreMasReciente.detalleCierre.find(detalle => detalle.centroCosto === centroCosto) || null;
-  }
-
-  getTextoPorcentajeCentro(centroCosto: string): string {
-    const cierreMasReciente = this.getUltimoCierrePorCentro(centroCosto);
-    if (!cierreMasReciente) {
-      return 'Sin cierre registrado';
-    }
-
-    const detalle = this.getCentroDetalleHistorico(centroCosto);
-    const periodo = this.getPeriodoHistorico(cierreMasReciente, detalle);
-    return 'Ultimo cierre registrado: ' + periodo;
-  }
-
-  getAgnoUltimoCierreCentro(centroCosto: string): number | null {
-    if (Object.prototype.hasOwnProperty.call(this.agnoUltimoCierrePorCentro || {}, centroCosto)) {
-      return this.agnoUltimoCierrePorCentro[centroCosto];
-    }
-
-    const cierreMasReciente = this.getUltimoCierrePorCentro(centroCosto);
-    if (!cierreMasReciente) {
-      return null;
-    }
-
-    const detalle = this.getDetalleCierreHistorico(cierreMasReciente, centroCosto);
-    return detalle && detalle.fechaCorte
-      ? new Date(detalle.fechaCorte).getFullYear()
-      : cierreMasReciente.agno;
-  }
-
-  retEstadoPagoMayor(arr: any[]) {
-    let fecha = null;
-    arr.forEach(el => {
-      if (new Date(fecha) <= new Date(el.fecha))
-        fecha = el.fecha
-    });
-    return fecha
-  }
-
-  onlyUnique(value, index, self) {
-    return self.findIndex(el => el._id === value._id) === index;
-  }
+  // ---------------------------------------------------------------------------
+  // Textos del template
+  // ---------------------------------------------------------------------------
 
   puedeConcluir(): boolean {
     const etapasValidas = this.tipoCierre !== 'etapas' || this.areEtapasConfiguradas();
     const fechaDirectaValida = this.tipoCierre !== 'directo' || !!this.fechaCorte;
-    return !!this.agno && this.cerrar.length === 1 && !!this.tipoCierre && fechaDirectaValida && etapasValidas && !this.loading;
+    return !!this.agno
+      && this.cerrar.length === 1
+      && !!this.tipoCierre
+      && fechaDirectaValida
+      && etapasValidas
+      && !this.loading;
   }
 
   getTextoAccionPrincipal(): string {
@@ -400,11 +276,7 @@ export class CierreAnualComponent implements OnInit {
   }
 
   getResumenSeleccion(): string {
-    if (!this.cerrar.length) {
-      return 'Aun no hay centro seleccionado.';
-    }
-
-    return this.cerrar[0];
+    return this.cerrar.length ? this.cerrar[0] : 'Aun no hay centro seleccionado.';
   }
 
   getFechaCorteVisible(): string {
@@ -417,11 +289,7 @@ export class CierreAnualComponent implements OnInit {
   }
 
   getFechaCorteInputVisible(): string {
-    if (!this.fechaCorte) {
-      return '';
-    }
-
-    return this.fechaCorte.split('T')[0];
+    return this.fechaCorte ? this.fechaCorte.split('T')[0] : '';
   }
 
   getPeriodoVisible(): string {
@@ -440,42 +308,6 @@ export class CierreAnualComponent implements OnInit {
       : this.agno.toString();
   }
 
-  seleccionarTodos() {
-    this.cerrar = (this.centrosCostoItems || []).map(centro => centro.nombre);
-    this.selectCentro.emit(this.cerrar);
-  }
-
-  limpiarSeleccion() {
-    this.cerrar = [];
-    this.selectCentro.emit(this.cerrar);
-  }
-
-  setTipoCierre(tipo: string) {
-    this.tipoCierre = tipo;
-    if (tipo !== 'etapas') {
-      this.fechaCorte = null;
-      if ($) {
-        $('#txtfechaCorte').val('');
-      }
-      this.cantidadEtapas = null;
-      this.etapasCierre = [];
-    } else {
-      this.fechaCorte = null;
-      if ($) {
-        $('#txtfechaCorte').val('');
-      }
-
-      if (this.cantidadEtapas) {
-        this.buildEtapas();
-      }
-    }
-  }
-
-  setCantidadEtapas(cantidad: number) {
-    this.cantidadEtapas = cantidad;
-    this.buildEtapas();
-  }
-
   getTipoCierreVisible(): string {
     if (this.tipoCierre === 'directo') {
       return 'Directo';
@@ -488,35 +320,6 @@ export class CierreAnualComponent implements OnInit {
     return 'Pendiente';
   }
 
-  onFechaFinEtapaChange(index: number, value: string) {
-    if (!this.etapasCierre[index]) {
-      return;
-    }
-
-    this.etapasCierre[index].fechaFin = value || null;
-
-    for (let etapaIndex = index + 1; etapaIndex < this.etapasCierre.length; etapaIndex++) {
-      const etapaAnterior = this.etapasCierre[etapaIndex - 1];
-      this.etapasCierre[etapaIndex].fechaInicio = etapaAnterior && etapaAnterior.fechaFin
-        ? this.getNextDateInputValue(etapaAnterior.fechaFin)
-        : null;
-
-      if (this.etapasCierre[etapaIndex].fechaFin && this.etapasCierre[etapaIndex].fechaInicio && this.etapasCierre[etapaIndex].fechaFin < this.etapasCierre[etapaIndex].fechaInicio) {
-        this.etapasCierre[etapaIndex].fechaFin = null;
-      }
-    }
-  }
-
-  onFechaInicioEtapaChange(index: number, value: string) {
-    if (index !== 0 || !this.etapasCierre[index]) {
-      return;
-    }
-
-    this.fechaCorte = value ? this.ReturnFecha(value) : null;
-    this.etapasCierre[index].fechaInicio = value || null;
-    this.syncEtapasDesdeFechaCorte();
-  }
-
   getResumenEtapas(): string {
     if (this.tipoCierre !== 'etapas') {
       return 'Sin etapas';
@@ -526,316 +329,144 @@ export class CierreAnualComponent implements OnInit {
       return 'Pendiente';
     }
 
-    if (!this.areEtapasConfiguradas()) {
-      return this.cantidadEtapas + ' etapas por configurar';
-    }
-
-    return this.cantidadEtapas + ' etapas configuradas';
+    return this.areEtapasConfiguradas()
+      ? this.cantidadEtapas + ' etapas configuradas'
+      : this.cantidadEtapas + ' etapas por configurar';
   }
 
-  getCentroCardStyle(centro: any): any {
-    const palette = this.buildCentroPalette(centro, this.isActive(centro));
-    return {
-      'background-color': palette.background,
-      'border-color': palette.border,
-      'color': palette.text
-    };
-  }
+  // ---------------------------------------------------------------------------
+  // Cierre
+  // ---------------------------------------------------------------------------
 
-  getCentroIconStyle(centro: any): any {
-    const palette = this.buildCentroPalette(centro, this.isActive(centro));
-    return {
-      'background-color': palette.iconBackground,
-      'color': palette.iconText
-    };
-  }
-
-  getCentroTextStyle(centro: any): any {
-    const palette = this.buildCentroPalette(centro, this.isActive(centro));
-    return {
-      'color': palette.text
-    };
-  }
-
-  getCentroMetaStyle(centro: any): any {
-    const palette = this.buildCentroPalette(centro, this.isActive(centro));
-    return {
-      'color': palette.mutedText
-    };
-  }
-
-  getCentroProgressTrackStyle(centro: any): any {
-    const palette = this.buildCentroPalette(centro, this.isActive(centro));
-    return {
-      'background-color': palette.progressTrack
-    };
-  }
-
-  getCentroProgressStyle(centro: any): any {
-    const palette = this.buildCentroPalette(centro, this.isActive(centro));
-    return {
-      'background-color': palette.progressFill
-    };
-  }
-
-  private buildAgnosDisponibles(): number[] {
-    const currentYear = new Date().getFullYear();
-    const agnos: number[] = [];
-
-    for (let agno = 2018; agno <= currentYear + 1; agno++) {
-      agnos.push(agno);
-    }
-
-    return agnos.reverse();
-  }
-
-  private setAgnoDefault() {
-    if (!this.agno) {
-      this.agno = new Date().getFullYear();
-    }
-  }
-
-  private loadCentrosCosto() {
-    this.centroCosto$.subscribe(centros => {
-      this.centrosCostoItems = (centros || [])
-        .reduce((acc, item) => acc.concat(item.subCentroCosto || []), [])
-        .filter(item => !!item && !!item.nombre)
-        .filter(item => this.isCentroVisible(item.nombre));
-      this.rebuildAgnoUltimoCierrePorCentro();
-    });
-  }
-
-  private isCentroVisible(nombre: string): boolean {
-    const centroNormalizado = (nombre || '').trim().toLowerCase();
-    if (!centroNormalizado) {
-      return false;
-    }
-
-    if (this.centrosExcluidos.indexOf(centroNormalizado) !== -1) {
-      return false;
-    }
-
-    return !this.centrosExcluidosPorCoincidencia.some(fragmento => centroNormalizado.indexOf(fragmento) !== -1);
-  }
-
-  private buildEtapas() {
-    if (!this.cantidadEtapas || this.cantidadEtapas < 2) {
-      this.etapasCierre = [];
+  concluir() {
+    if (!this.puedeConcluir() || !this.getFechaCorteOperativa()) {
       return;
     }
 
-    const etapasPrevias = this.etapasCierre || [];
-    const fechaBase = this.getFechaCorteInputValue();
-    this.etapasCierre = Array.from({ length: this.cantidadEtapas }, (_, index) => {
-      const etapaAnterior = index > 0 ? etapasPrevias[index - 1] : null;
-      const etapaActual = etapasPrevias[index] || {};
-      const fechaInicio = index === 0
-        ? (etapaActual.fechaInicio || fechaBase)
-        : this.getNextDateInputValue((this.etapasCierre[index - 1] && this.etapasCierre[index - 1].fechaFin) || (etapaAnterior && etapaAnterior.fechaFin) || null);
+    const centroCosto = this.cerrar[0];
+    this.loading = true;
 
-      return {
-        numero: index + 1,
-        fechaInicio: fechaInicio,
-        fechaFin: etapaActual.fechaFin || null
-      };
-    });
+    forkJoin(
+      this.OrdenCompra.getOrdenComprabyCentroCosto(centroCosto),
+      this.OrdenPedido.getOrdenPedidobyCentroCosto(centroCosto)
+    )
+      .pipe(
+        mergeMap(([ordenesCompra, ordenesPedido]: any[]) => {
+          const cierre: any = {
+            _id: null,
+            agno: this.agno,
+            OC: this.filtrarOrdenesEnPeriodo(ordenesCompra),
+            OP: this.filtrarOrdenesEnPeriodo(ordenesPedido),
+            detalleCierre: [this.buildDetalleCierre()]
+          };
 
-    this.syncEtapasDesdeFechaCorte();
+          const actualizaciones = this.cerrarEP(ordenesCompra, cierre.OC, 1)
+            .concat(this.cerrarEP(ordenesPedido, cierre.OP, 2));
+
+          const actualizar$: Observable<any> = actualizaciones.length
+            ? forkJoin(...actualizaciones)
+            : of(null);
+
+          return actualizar$.pipe(mergeMap(() => this.persistirCierre(cierre)));
+        })
+      )
+      .subscribe(() => {
+        this.loading = false;
+        this.showConcluirSuccess();
+        this.reload.emit(null);
+      }, (error: any) => this.handleConcluirError(error));
   }
 
-  private syncEtapasDesdeFechaCorte() {
-    if (!this.etapasCierre || !this.etapasCierre.length) {
+  retEP(estadoPagos: any[]): any[] {
+    return (estadoPagos || []).filter(estadoPago =>
+      this.isEstadoPagoEnPeriodo(estadoPago) && !estadoPago.cerrado
+    );
+  }
+
+  cerrarEP(ordenesOriginales: any[], ordenesCierre: any[], tipo: number): Observable<any>[] {
+    const idsSeleccionados: { [key: string]: boolean } = {};
+    (ordenesCierre || []).forEach(orden => idsSeleccionados[String(orden._id)] = true);
+
+    return (ordenesOriginales || [])
+      .filter(orden => !!idsSeleccionados[String(orden._id)])
+      .map(orden => {
+        orden.estadosPagos = (orden.estadosPagos || []).map(estadoPago =>
+          this.isEstadoPagoEnPeriodo(estadoPago) && !estadoPago.cerrado
+            ? { ...estadoPago, cerrado: true }
+            : { ...estadoPago }
+        );
+
+        return tipo == 1
+          ? this.OrdenCompra.putOrdenCompra(orden)
+          : this.OrdenPedido.putOrdenPedido(orden);
+      });
+  }
+
+  onlyUnique(value: any, index: number, self: any[]): boolean {
+    return self.findIndex(el => el._id === value._id) === index;
+  }
+
+  private filtrarOrdenesEnPeriodo(ordenes: any[]): any[] {
+    return (ordenes || [])
+      .map(orden => ({ ...orden, estadosPagos: this.retEP(orden.estadosPagos || []) }))
+      .filter(orden => orden.estadosPagos.length);
+  }
+
+  private persistirCierre(cierre: any): Observable<any> {
+    return this.Cierre.getCierreByAgno(this.agno).pipe(
+      take(1),
+      mergeMap((cierreHistorico: any[]) => {
+        if (!cierreHistorico || !cierreHistorico.length) {
+          return this.Cierre.guardarCierreEnFirebase(cierre);
+        }
+
+        const historico = cierreHistorico[0];
+        historico.OC = historico.OC && historico.OC.length
+          ? historico.OC.concat(cierre.OC).filter(this.onlyUnique)
+          : cierre.OC;
+        historico.OP = historico.OP && historico.OP.length
+          ? historico.OP.concat(cierre.OP).filter(this.onlyUnique)
+          : cierre.OP;
+        historico.detalleCierre = this.mergeDetalleCierre(historico.detalleCierre, cierre.detalleCierre);
+
+        return this.Cierre.guardarCierreEnFirebase(historico);
+      }),
+      take(1)
+    );
+  }
+
+  private handleConcluirError(error: any) {
+    console.log(error);
+    this.loading = false;
+    if (typeof Swal !== 'undefined') {
+      Swal.fire('Cierre', 'No fue posible completar el cierre. Intenta nuevamente.', 'error');
+    }
+  }
+
+  private showConcluirSuccess() {
+    if (typeof Swal === 'undefined') {
       return;
     }
 
-    const fechaBase = this.getFechaCorteInputValue();
-    this.etapasCierre[0].fechaInicio = fechaBase;
-    if (this.etapasCierre[0].fechaFin && this.etapasCierre[0].fechaInicio && this.etapasCierre[0].fechaFin < this.etapasCierre[0].fechaInicio) {
-      this.etapasCierre[0].fechaFin = null;
-    }
-
-    for (let index = 1; index < this.etapasCierre.length; index++) {
-      this.etapasCierre[index].fechaInicio = this.getNextDateInputValue(this.etapasCierre[index - 1].fechaFin || null);
-      if (this.etapasCierre[index].fechaFin && this.etapasCierre[index].fechaInicio && this.etapasCierre[index].fechaFin < this.etapasCierre[index].fechaInicio) {
-        this.etapasCierre[index].fechaFin = null;
-      }
-    }
-  }
-
-  private getFechaCorteInputValue(): string | null {
-    if (!this.fechaCorte) {
-      return null;
-    }
-
-    return this.fechaCorte.split('T')[0];
-  }
-
-  private getFechaCorteOperativa(): string | null {
-    if (this.tipoCierre === 'etapas') {
-      const ultimaEtapa = this.etapasCierre && this.etapasCierre.length
-        ? this.etapasCierre[this.etapasCierre.length - 1]
-        : null;
-
-      return ultimaEtapa && ultimaEtapa.fechaFin
-        ? this.ReturnFecha(ultimaEtapa.fechaFin)
-        : null;
-    }
-
-    return this.fechaCorte;
-  }
-
-  private formatDateInput(fecha: Date): string {
-    const year = fecha.getFullYear();
-    const month = (fecha.getMonth() + 1).toString().padStart(2, '0');
-    const day = fecha.getDate().toString().padStart(2, '0');
-    return year + '-' + month + '-' + day;
-  }
-
-  private getNextDateInputValue(value: string): string | null {
-    if (!value) {
-      return null;
-    }
-
-    const fecha = new Date(value + 'T00:00:00');
-    fecha.setDate(fecha.getDate() + 1);
-    return this.formatDateInput(fecha);
-  }
-
-  private areEtapasConfiguradas(): boolean {
-    return !!this.cantidadEtapas
-      && this.etapasCierre.length === this.cantidadEtapas
-      && this.etapasCierre.every(etapa => !!etapa.fechaInicio && !!etapa.fechaFin && etapa.fechaFin >= etapa.fechaInicio);
-  }
-
-  private getUltimoCierrePorCentro(centroCosto: string): any {
-    return (this.cierresHistoricos || []).reduce((ultimoCierre, cierreActual) => {
-      if (!this.cierreIncluyeCentro(cierreActual, centroCosto)) {
-        return ultimoCierre;
-      }
-
-      if (!ultimoCierre) {
-        return cierreActual;
-      }
-
-      return this.getFechaCorteHistorica(cierreActual, centroCosto) >= this.getFechaCorteHistorica(ultimoCierre, centroCosto)
-        ? cierreActual
-        : ultimoCierre;
-    }, null);
-  }
-
-  private getFechaCorteHistorica(cierre: any, centroCosto: string): number {
-    if (!cierre) {
-      return 0;
-    }
-
-    const detalle = this.getDetalleCierreHistorico(cierre, centroCosto);
-    if (detalle && detalle.fechaCorte) {
-      return new Date(detalle.fechaCorte).getTime();
-    }
-
-    return cierre.agno
-      ? new Date(cierre.agno, 11, 31).getTime()
-      : 0;
-  }
-
-  private getDetalleCierreHistorico(cierre: any, centroCosto: string): any {
-    if (!cierre || !cierre.detalleCierre) {
-      return null;
-    }
-
-    return cierre.detalleCierre.find((item: any) => item && item.centroCosto === centroCosto) || null;
-  }
-
-  private cierreIncluyeCentro(cierre: any, centroCosto: string): boolean {
-    return !!cierre && (cierre.OC || []).concat(cierre.OP || [])
-      .some((orden: any) => orden.ingresoEgreso == 1 && orden.subCentroCosto == centroCosto);
-  }
-
-  private rebuildAgnoUltimoCierrePorCentro() {
-    const cache: { [key: string]: number } = {};
-
-    (this.centrosCostoItems || []).forEach((centro: any) => {
-      const cierreMasReciente = this.getUltimoCierrePorCentro(centro.nombre);
-      if (!cierreMasReciente) {
-        return;
-      }
-
-      const detalle = this.getDetalleCierreHistorico(cierreMasReciente, centro.nombre);
-      cache[centro.nombre] = detalle && detalle.fechaCorte
-        ? new Date(detalle.fechaCorte).getFullYear()
-        : cierreMasReciente.agno;
-    });
-
-    this.agnoUltimoCierrePorCentro = cache;
-  }
-
-  private getMontoMovimiento(movimiento: any): number {
-    if (!movimiento) {
-      return 0;
-    }
-
-    return movimiento.monto || movimiento.costo || 0;
-  }
-
-  private getPeriodoHistorico(cierre: any, detalle: any): string {
-    if (!cierre) {
-      return 'sin periodo';
-    }
-
-    if (!detalle || !detalle.fechaCorte) {
-      return cierre.agno ? cierre.agno.toString() : 'sin periodo';
-    }
-
-    const agnoFinal = new Date(detalle.fechaCorte).getFullYear();
-    return cierre.agno && agnoFinal > cierre.agno
-      ? cierre.agno + ' - ' + agnoFinal
-      : (cierre.agno ? cierre.agno.toString() : agnoFinal.toString());
-  }
-
-  private getTotalCerradoCentro(centroCosto: string): number {
-    const pagosRegistrados: { [key: string]: boolean } = {};
-
-    return Math.ceil((this.cierresHistoricos || []).reduce((totalAcumulado, cierre) => {
-      const ordenesCentro = (cierre.OC || [])
-        .concat(cierre.OP || [])
-        .filter((orden: any) => orden.ingresoEgreso == 1 && orden.subCentroCosto == centroCosto);
-
-      const totalCierre = ordenesCentro.reduce((totalOrdenes: number, orden: any) => {
-        const totalPagos = (orden.estadosPagos || []).reduce((totalPagosOrden: number, estadoPago: any) => {
-          const llavePago = this.buildPagoCerradoKey(orden, estadoPago);
-          if (pagosRegistrados[llavePago]) {
-            return totalPagosOrden;
-          }
-
-          pagosRegistrados[llavePago] = true;
-          return totalPagosOrden + (estadoPago.monto || 0);
-        }, 0);
-
-        return totalOrdenes + totalPagos;
-      }, 0);
-
-      return totalAcumulado + totalCierre;
-    }, 0));
-  }
-
-  private buildPagoCerradoKey(orden: any, estadoPago: any): string {
-    return [
-      orden && orden._id ? orden._id : '',
-      estadoPago && estadoPago.fecha ? estadoPago.fecha : '',
-      estadoPago && estadoPago.monto ? estadoPago.monto : 0,
-      estadoPago && estadoPago.numeroPago ? estadoPago.numeroPago : '',
-      estadoPago && estadoPago.factura ? estadoPago.factura : ''
-    ].join('|');
+    const centro = this.cerrar.length ? this.cerrar[0] : 'centro seleccionado';
+    Swal.fire(
+      'Cierre',
+      'Se ha realizado correctamente el cierre de ' + centro + ' para el periodo ' + this.getPeriodoVisible(),
+      'success'
+    );
   }
 
   private buildDetalleCierre(): any {
+    const esEtapas = this.tipoCierre === 'etapas';
+
     return {
       centroCosto: this.cerrar[0],
       tipoCierre: this.tipoCierre,
-      cantidadEtapas: this.tipoCierre === 'etapas' ? this.cantidadEtapas : 1,
+      cantidadEtapas: esEtapas ? this.cantidadEtapas : 1,
+      fechaInicio: esEtapas && this.etapasCierre.length ? this.etapasCierre[0].fechaInicio : null,
       fechaCorte: this.getFechaCorteOperativa(),
-      etapas: this.tipoCierre === 'etapas'
-        ? (this.etapasCierre || []).map(etapa => ({
+      etapas: esEtapas
+        ? this.etapasCierre.map(etapa => ({
             numero: etapa.numero,
             fechaInicio: etapa.fechaInicio,
             fechaFin: etapa.fechaFin
@@ -849,80 +480,390 @@ export class CierreAnualComponent implements OnInit {
     return existente.concat(nuevo);
   }
 
-  private showConcluirSuccess() {
-    if (typeof Swal === 'undefined') {
+  // ---------------------------------------------------------------------------
+  // Fechas y etapas
+  // ---------------------------------------------------------------------------
+
+  private isEstadoPagoEnPeriodo(estadoPago: any): boolean {
+    const fechaPago = this.getDateOnly(estadoPago && estadoPago.fecha);
+    const fechaFin = this.getDateOnly(this.getFechaCorteOperativa());
+    if (!fechaPago || !fechaFin || fechaPago > fechaFin) {
+      return false;
+    }
+
+    if (this.tipoCierre !== 'etapas') {
+      return true;
+    }
+
+    const primeraEtapa = this.etapasCierre.length ? this.etapasCierre[0] : null;
+    const fechaInicio = this.getDateOnly(primeraEtapa && primeraEtapa.fechaInicio);
+    return !!fechaInicio && fechaPago >= fechaInicio;
+  }
+
+  private getDateOnly(value: any): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const date = String(value).split('T')[0];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return date;
+    }
+
+    const parts = date.split('/');
+    if (parts.length === 3) {
+      return parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+    }
+
+    return null;
+  }
+
+  private getFechaCorteOperativa(): string | null {
+    if (this.tipoCierre === 'etapas') {
+      const ultimaEtapa = this.etapasCierre.length ? this.etapasCierre[this.etapasCierre.length - 1] : null;
+      return ultimaEtapa && ultimaEtapa.fechaFin ? this.ReturnFecha(ultimaEtapa.fechaFin) : null;
+    }
+
+    return this.fechaCorte;
+  }
+
+  private getFechaCorteInputValue(): string | null {
+    return this.fechaCorte ? this.fechaCorte.split('T')[0] : null;
+  }
+
+  private buildEtapas() {
+    if (!this.cantidadEtapas || this.cantidadEtapas < 2) {
+      this.etapasCierre = [];
       return;
     }
 
-    const centro = this.cerrar && this.cerrar.length ? this.cerrar[0] : 'centro seleccionado';
-    const periodo = this.getPeriodoVisible();
-    Swal.fire(
-      'Cierre',
-      'Se ha realizado correctamente el cierre de ' + centro + ' para el periodo ' + periodo,
-      'success'
-    );
+    const etapasPrevias = this.etapasCierre || [];
+    const fechaBase = this.getFechaCorteInputValue();
+    const nuevasEtapas = [];
+
+    for (let index = 0; index < this.cantidadEtapas; index++) {
+      const etapaActual = etapasPrevias[index] || {};
+      const anterior = index > 0 ? (nuevasEtapas[index - 1] || etapasPrevias[index - 1]) : null;
+
+      nuevasEtapas.push({
+        numero: index + 1,
+        fechaInicio: index === 0
+          ? (etapaActual.fechaInicio || fechaBase)
+          : this.getNextDateInputValue(anterior && anterior.fechaFin ? anterior.fechaFin : null),
+        fechaFin: etapaActual.fechaFin || null
+      });
+    }
+
+    this.etapasCierre = nuevasEtapas;
+    this.syncEtapasDesdeFechaCorte();
   }
 
-  private buildCentroPalette(centro: any, active: boolean) {
+  private syncEtapasDesdeFechaCorte() {
+    if (!this.etapasCierre.length) {
+      return;
+    }
+
+    this.etapasCierre[0].fechaInicio = this.getFechaCorteInputValue();
+    this.limpiarFinSiEsInvalido(this.etapasCierre[0]);
+
+    for (let index = 1; index < this.etapasCierre.length; index++) {
+      this.etapasCierre[index].fechaInicio = this.getNextDateInputValue(this.etapasCierre[index - 1].fechaFin || null);
+      this.limpiarFinSiEsInvalido(this.etapasCierre[index]);
+    }
+  }
+
+  private limpiarFinSiEsInvalido(etapa: any) {
+    if (etapa.fechaFin && etapa.fechaInicio && etapa.fechaFin < etapa.fechaInicio) {
+      etapa.fechaFin = null;
+    }
+  }
+
+  private areEtapasConfiguradas(): boolean {
+    return !!this.cantidadEtapas
+      && this.etapasCierre.length === this.cantidadEtapas
+      && this.etapasCierre.every(etapa => !!etapa.fechaInicio && !!etapa.fechaFin && etapa.fechaFin >= etapa.fechaInicio);
+  }
+
+  private getNextDateInputValue(value: string): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const fecha = new Date(value + 'T00:00:00');
+    fecha.setDate(fecha.getDate() + 1);
+    return this.formatDateInput(fecha);
+  }
+
+  private formatDateInput(fecha: Date): string {
+    const month = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const day = fecha.getDate().toString().padStart(2, '0');
+    return fecha.getFullYear() + '-' + month + '-' + day;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Estado inicial
+  // ---------------------------------------------------------------------------
+
+  private resetFormulario() {
+    this.setAgnoDefault();
+    this.cerrar = [];
+    this.tipoCierre = null;
+    this.cantidadEtapas = null;
+    this.etapasCierre = [];
+    this.loading = false;
+    this.fechaCorte = null;
+    this.limpiarInputFechaCorte();
+  }
+
+  private limpiarInputFechaCorte() {
+    if (typeof $ !== 'undefined') {
+      $('#txtfechaCorte').val('');
+    }
+  }
+
+  private setAgnoDefault() {
+    if (!this.agno) {
+      this.agno = new Date().getFullYear();
+    }
+  }
+
+  private buildAgnosDisponibles(): number[] {
+    const agnos: number[] = [];
+    for (let agno = new Date().getFullYear() + 1; agno >= 2018; agno--) {
+      agnos.push(agno);
+    }
+    return agnos;
+  }
+
+  private buildCentrosCostoItems(): CentroCostoItem[] {
+    return (this.totales || [])
+      .filter(item => !!item && !!item.nombre && !!item.nombre.trim())
+      .map(item => ({
+        nombre: item.nombre,
+        fondo: item.fondo || '#dfe8ef',
+        letras: item.letras || '#264052'
+      }));
+  }
+
+  // ---------------------------------------------------------------------------
+  // Historico: porcentajes y ultimo cierre por centro
+  // ---------------------------------------------------------------------------
+
+  private rebuildResumenCentros() {
+    const resumen: { [key: string]: ResumenCentro } = {};
+    const agnos: { [key: string]: number } = {};
+
+    this.centrosCostoItems.forEach(centro => {
+      const nombre = centro.nombre;
+      const ultimoCierre = this.getUltimoCierrePorCentro(nombre);
+      const detalle = this.getDetalleCierreHistorico(ultimoCierre, nombre);
+
+      resumen[nombre] = {
+        porcentaje: this.calcularPorcentajeCentro(nombre),
+        texto: ultimoCierre
+          ? 'Ultimo cierre registrado: ' + this.getPeriodoHistorico(ultimoCierre, detalle)
+          : 'Sin cierre registrado'
+      };
+
+      if (ultimoCierre) {
+        agnos[nombre] = detalle && detalle.fechaCorte
+          ? new Date(detalle.fechaCorte).getFullYear()
+          : ultimoCierre.agno;
+      }
+    });
+
+    this.resumenPorCentro = resumen;
+    this.agnoUltimoCierrePorCentro = agnos;
+  }
+
+  private calcularPorcentajeCentro(centroCosto: string): number {
+    if (!this.totales) {
+      return 0;
+    }
+
+    const totalInfo = this.totales.find(el => el.nombre == centroCosto);
+    const totalCentro = totalInfo ? totalInfo.totalCentro : 0;
+    if (!totalCentro) {
+      return 0;
+    }
+
+    return Math.min(100, this.getTotalCerradoCentro(centroCosto) * 100 / totalCentro);
+  }
+
+  private getTotalCerradoCentro(centroCosto: string): number {
+    const pagosRegistrados: { [key: string]: boolean } = {};
+    let total = 0;
+
+    this.cierresHistoricos.forEach(cierre => {
+      this.getOrdenesEgresoCentro(cierre, centroCosto).forEach(orden => {
+        (orden.estadosPagos || []).forEach(estadoPago => {
+          const llave = this.buildPagoCerradoKey(orden, estadoPago);
+          if (!pagosRegistrados[llave]) {
+            pagosRegistrados[llave] = true;
+            total += estadoPago.monto || 0;
+          }
+        });
+      });
+    });
+
+    return Math.ceil(total);
+  }
+
+  private getUltimoCierrePorCentro(centroCosto: string): any {
+    let ultimo = null;
+    let fechaUltimo = -Infinity;
+
+    this.cierresHistoricos.forEach(cierre => {
+      if (!this.getOrdenesEgresoCentro(cierre, centroCosto).length) {
+        return;
+      }
+
+      const fecha = this.getFechaCorteHistorica(cierre, centroCosto);
+      if (!ultimo || fecha >= fechaUltimo) {
+        ultimo = cierre;
+        fechaUltimo = fecha;
+      }
+    });
+
+    return ultimo;
+  }
+
+  private getOrdenesEgresoCentro(cierre: any, centroCosto: string): any[] {
+    if (!cierre) {
+      return [];
+    }
+
+    return (cierre.OC || [])
+      .concat(cierre.OP || [])
+      .filter((orden: any) => orden.ingresoEgreso == 1 && orden.subCentroCosto == centroCosto);
+  }
+
+  private getFechaCorteHistorica(cierre: any, centroCosto: string): number {
+    if (!cierre) {
+      return 0;
+    }
+
+    const detalle = this.getDetalleCierreHistorico(cierre, centroCosto);
+    if (detalle && detalle.fechaCorte) {
+      return new Date(detalle.fechaCorte).getTime();
+    }
+
+    return cierre.agno ? new Date(cierre.agno, 11, 31).getTime() : 0;
+  }
+
+  private getDetalleCierreHistorico(cierre: any, centroCosto: string): any {
+    if (!cierre || !cierre.detalleCierre) {
+      return null;
+    }
+
+    return cierre.detalleCierre.find((item: any) => item && item.centroCosto === centroCosto) || null;
+  }
+
+  private getPeriodoHistorico(cierre: any, detalle: any): string {
+    if (!cierre) {
+      return 'sin periodo';
+    }
+
+    if (!detalle || !detalle.fechaCorte) {
+      return cierre.agno ? cierre.agno.toString() : 'sin periodo';
+    }
+
+    const agnoFinal = new Date(detalle.fechaCorte).getFullYear();
+    if (cierre.agno && agnoFinal > cierre.agno) {
+      return cierre.agno + ' - ' + agnoFinal;
+    }
+
+    return cierre.agno ? cierre.agno.toString() : agnoFinal.toString();
+  }
+
+  private buildPagoCerradoKey(orden: any, estadoPago: any): string {
+    return [
+      orden && orden._id ? orden._id : '',
+      estadoPago && estadoPago.fecha ? estadoPago.fecha : '',
+      estadoPago && estadoPago.monto ? estadoPago.monto : 0,
+      estadoPago && estadoPago.numeroPago ? estadoPago.numeroPago : '',
+      estadoPago && estadoPago.factura ? estadoPago.factura : ''
+    ].join('|');
+  }
+
+  // ---------------------------------------------------------------------------
+  // Colores de las tarjetas
+  // ---------------------------------------------------------------------------
+
+  private getEstilosCentro(centro: CentroCostoItem): EstilosCentro {
+    const active = this.isActive(centro);
+    const key = centro.nombre + '|' + centro.fondo + '|' + centro.letras + '|' + (active ? 1 : 0);
+
+    if (!this.estilosCache[key]) {
+      const palette = this.buildCentroPalette(centro, active);
+      this.estilosCache[key] = {
+        card: { 'background-color': palette.background, 'border-color': palette.border, 'color': palette.text },
+        icon: { 'background-color': palette.iconBackground, 'color': palette.iconText },
+        text: { 'color': palette.text },
+        meta: { 'color': palette.mutedText },
+        track: { 'background-color': palette.progressTrack },
+        progress: { 'background-color': palette.progressFill }
+      };
+    }
+
+    return this.estilosCache[key];
+  }
+
+  private buildCentroPalette(centro: CentroCostoItem, active: boolean) {
     const fondo = this.normalizeColor(centro && centro.fondo, '#dfe8ef');
     const letras = this.normalizeColor(centro && centro.letras, '#264052');
-    const softenedBackground = this.mixColors(fondo, '#ffffff', active ? 0.78 : 0.88);
-    const softenedBorder = this.mixColors(fondo, '#cfd9e1', active ? 0.44 : 0.6);
+    const background = this.mixColors(fondo, '#ffffff', active ? 0.78 : 0.88);
     const iconBackground = this.mixColors(fondo, '#ffffff', active ? 0.6 : 0.74);
-    const progressTrack = this.mixColors(fondo, '#eef3f7', active ? 0.5 : 0.68);
-    const progressFill = this.mixColors(fondo, '#8aa1b3', active ? 0.22 : 0.34);
+    const text = this.ensureReadableText(background, letras);
 
     return {
-      background: softenedBackground,
-      border: softenedBorder,
-      text: this.ensureReadableText(softenedBackground, letras),
-      mutedText: this.mixColors(this.ensureReadableText(softenedBackground, letras), '#6c7f8b', active ? 0.2 : 0.42),
-      iconBackground: iconBackground,
+      background,
+      border: this.mixColors(fondo, '#cfd9e1', active ? 0.44 : 0.6),
+      text,
+      mutedText: this.mixColors(text, '#6c7f8b', active ? 0.2 : 0.42),
+      iconBackground,
       iconText: this.ensureReadableText(iconBackground, letras),
-      progressTrack: progressTrack,
-      progressFill: progressFill
+      progressTrack: this.mixColors(fondo, '#eef3f7', active ? 0.5 : 0.68),
+      progressFill: this.mixColors(fondo, '#8aa1b3', active ? 0.22 : 0.34)
     };
   }
 
   private ensureReadableText(background: string, preferred: string): string {
-    return this.getContrastRatio(background, preferred) >= 4.2
-      ? preferred
-      : this.getLuminance(background) > 0.62
-        ? '#244052'
-        : '#ffffff';
+    if (this.getContrastRatio(background, preferred) >= 4.2) {
+      return preferred;
+    }
+
+    return this.getLuminance(background) > 0.62 ? '#244052' : '#ffffff';
   }
 
   private getContrastRatio(colorA: string, colorB: string): number {
     const luminanceA = this.getLuminance(colorA);
     const luminanceB = this.getLuminance(colorB);
-    const lighter = Math.max(luminanceA, luminanceB);
-    const darker = Math.min(luminanceA, luminanceB);
-    return (lighter + 0.05) / (darker + 0.05);
+    return (Math.max(luminanceA, luminanceB) + 0.05) / (Math.min(luminanceA, luminanceB) + 0.05);
   }
 
   private getLuminance(color: string): number {
-    const rgb = this.hexToRgb(this.normalizeColor(color, '#ffffff'));
-    const channels = [rgb.r, rgb.g, rgb.b].map(channel => {
+    const rgb = this.hexToRgb(color);
+    const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(channel => {
       const normalized = channel / 255;
       return normalized <= 0.03928
         ? normalized / 12.92
         : Math.pow((normalized + 0.055) / 1.055, 2.4);
     });
 
-    return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   }
 
   private mixColors(primary: string, secondary: string, secondaryWeight: number): string {
-    const safeWeight = Math.max(0, Math.min(1, secondaryWeight));
-    const primaryRgb = this.hexToRgb(this.normalizeColor(primary, '#ffffff'));
-    const secondaryRgb = this.hexToRgb(this.normalizeColor(secondary, '#ffffff'));
-    const mixed = {
-      r: Math.round(primaryRgb.r * (1 - safeWeight) + secondaryRgb.r * safeWeight),
-      g: Math.round(primaryRgb.g * (1 - safeWeight) + secondaryRgb.g * safeWeight),
-      b: Math.round(primaryRgb.b * (1 - safeWeight) + secondaryRgb.b * safeWeight)
-    };
+    const weight = Math.max(0, Math.min(1, secondaryWeight));
+    const a = this.hexToRgb(primary);
+    const b = this.hexToRgb(secondary);
 
-    return this.rgbToHex(mixed.r, mixed.g, mixed.b);
+    return this.rgbToHex(
+      Math.round(a.r * (1 - weight) + b.r * weight),
+      Math.round(a.g * (1 - weight) + b.g * weight),
+      Math.round(a.b * (1 - weight) + b.b * weight)
+    );
   }
 
   private normalizeColor(color: string, fallback: string): string {

@@ -33,7 +33,7 @@
                           <span *ngIf="reporteProductos.promedio < 1.81">C</span>
                         </td>
                         <td>{{reporteProductos.promedio | number:'1.2-2'}}</td>
-                        <td>{{reporteProductos.cantidadProveedores}}</td>
+                        <td>{{reporteProductos.cantidadProveedores}} ({{porcentajeProveedores(reporteProductos.cantidadProveedores) | number:'1.0-0'}}%)</td>
                         <td>{{reporteProductos.cantidadOC}}</td>
                         <td>{{reporteProductos.general / 3 * 100 | number:'1.0-0'}}%</td>
                     </tr>
@@ -49,7 +49,7 @@
                           <span *ngIf="reporteServicios.promedio < 1.81">C</span>
                         </td>
                         <td>{{reporteServicios.promedio | number:'1.2-2'}}</td>
-                        <td>{{reporteServicios.cantidadProveedores}}</td>
+                        <td>{{reporteServicios.cantidadProveedores}} ({{porcentajeProveedores(reporteServicios.cantidadProveedores) | number:'1.0-0'}}%)</td>
                         <td>{{reporteServicios.cantidadOC}}</td>
                         <td>{{reporteServicios.general / 3 * 100 | number:'1.0-0'}}%</td>
                     </tr>
@@ -65,7 +65,7 @@
                           <span *ngIf="reporteSubcontrato.promedio < 1.81">C</span>
                         </td>
                         <td>{{reporteSubcontrato.promedio | number:'1.2-2'}}</td>
-                        <td>{{reporteSubcontrato.cantidadProveedores}}</td>
+                        <td>{{reporteSubcontrato.cantidadProveedores}} ({{porcentajeProveedores(reporteSubcontrato.cantidadProveedores) | number:'1.0-0'}}%)</td>
                         <td>{{reporteSubcontrato.cantidadOC}}</td>
                         <td>{{reporteSubcontrato.general / 3 * 100 | number:'1.0-0'}}%</td>
                     </tr>
@@ -81,7 +81,7 @@
                         <span *ngIf="(reporteProductos.promedio + reporteServicios.promedio + reporteSubcontrato.promedio) / 3 < 1.81">C</span>
                       </th>
                       <th></th>
-                      <th>{{reporteProductos.cantidadProveedores + reporteServicios.cantidadProveedores + reporteSubcontrato.cantidadProveedores}}</th>
+                      <th>{{totalProveedores}} ({{porcentajeProveedores(totalProveedores) | number:'1.0-0'}}%)</th>
                       <th>{{reporteProductos.cantidadOC + reporteServicios.cantidadOC + reporteSubcontrato.cantidadOC}}</th>
                       <th>{{(reporteProductos.general + reporteServicios.general + reporteSubcontrato.general) / 3 * 100 | number:'1.0-0'}}%</th>
                     </tr>
@@ -97,7 +97,7 @@
     <span *ngIf="reporteSustituir.promedio < 1.81">C</span>
   </td>
   <td></td>
-  <td>{{reporteSustituir.cantidadProveedores}}</td>
+  <td>{{reporteSustituir.cantidadProveedores}} ({{porcentajeProveedores(reporteSustituir.cantidadProveedores) | number:'1.0-0'}}%)</td>
   <td>{{reporteSustituir.cantidadOC}}</td>
   <td>{{reporteSustituir.general / 3 * 100 | number:'1.0-0'}}%</td>
 </tr>
